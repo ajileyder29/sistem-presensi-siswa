@@ -73,32 +73,30 @@
         /* AdminLTE Layout Structure */
         .wrapper {
             display: flex;
+            flex-direction: column;
             min-height: calc(100vh - 73px);
         }
 
         .main-sidebar {
-            width: 250px;
+            width: 100%;
             background-color: var(--nav-bg);
-            border-right: 1px solid var(--nav-border);
-            padding: 15px 0;
+            border-bottom: 1px solid var(--nav-border);
+            padding: 10px 0;
             z-index: 10;
             transition: all 0.3s ease;
-            overflow-x: hidden;
-            white-space: nowrap;
             backdrop-filter: var(--glass-blur);
-        }
-
-        .wrapper.collapsed .main-sidebar {
-            width: 0;
-            border-right: none;
         }
 
         .nav-sidebar {
             list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .nav-item a {
-            padding: 12px 25px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             color: var(--text-color);
@@ -115,8 +113,8 @@
 
         .nav-item a:hover, .nav-item.active a {
             background: rgba(79, 70, 229, 0.1);
-            border-left: 4px solid var(--primary-color);
-            padding-left: 21px;
+            border-bottom: 3px solid var(--primary-color);
+            border-radius: 4px 4px 0 0;
         }
 
         .btn-logout {
@@ -293,9 +291,6 @@
 
     <nav>
         <div style="display: flex; align-items: center;">
-            <button id="sidebar-toggle" class="sidebar-toggle-btn">
-                <i class="fas fa-bars"></i>
-            </button>
             <div class="logo">SekolahKu</div>
         </div>
         <div style="display: flex; align-items: center;">
@@ -495,18 +490,6 @@
         if (role === 'Admin') {
             document.getElementById('admin-widgets').style.display = 'grid';
         }
-
-        // Sidebar Toggle Logic
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const wrapper = document.querySelector('.wrapper');
-
-        sidebarToggle.addEventListener('click', () => {
-            if (window.innerWidth <= 768) {
-                wrapper.classList.toggle('sidebar-open');
-            } else {
-                wrapper.classList.toggle('collapsed');
-            }
-        });
     </script>
 </body>
 </html>
