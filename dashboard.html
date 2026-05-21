@@ -96,12 +96,12 @@
         }
 
         .nav-item a {
-            padding: 10px 20px;
+            padding: 8px 15px;
             display: flex;
             align-items: center;
             color: var(--text-color);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
@@ -129,23 +129,6 @@
 
         .btn-logout:hover {
             opacity: 0.8;
-        }
-
-        .sidebar-toggle-btn {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s;
-        }
-
-        .sidebar-toggle-btn:hover {
-            color: var(--primary-color);
         }
 
         .content {
@@ -204,6 +187,16 @@
 
         h1 { margin-bottom: 10px; }
         p { color: var(--text-muted); }
+
+        /* Penyesuaian Mobile */
+        @media (max-width: 600px) {
+            nav { padding: 15px 20px; }
+            .logo { font-size: 1rem; }
+            .content { padding: 20px 15px; }
+            .welcome-card h1 { font-size: 1.4rem; }
+            .info-box-icon { width: 60px; height: 60px; font-size: 1.4rem; }
+            .nav-item i { width: 20px; font-size: 1rem; margin-right: 5px; }
+        }
 
         /* Theme Toggle Slider in Nav */
         .theme-switch-wrapper {
@@ -273,17 +266,6 @@
         .fa-sun { color: #f1c40f; }
         .fa-moon { color: #6b7280; }
         body.dark .fa-moon { color: #f3f4f6; }
-
-        @media (max-width: 768px) {
-            .main-sidebar {
-                width: 0;
-                border-right: none;
-            }
-            .wrapper.sidebar-open .main-sidebar {
-                width: 250px;
-                border-right: 1px solid var(--nav-border);
-            }
-        }
     </style>
 </head>
 <body>
