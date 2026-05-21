@@ -106,7 +106,7 @@
         }
 
         .slider-toggle {
-            background-color: var(--bg-color);
+            background-color: var(--selector-bg, rgba(0,0,0,0.05));
             border: 1px solid var(--nav-border);
             bottom: 0;
             cursor: pointer;
@@ -114,38 +114,41 @@
             position: absolute;
             right: 0;
             top: 0;
-            transition: .4s;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border-radius: 34px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 4px;
+            padding: 0 6px;
+            backdrop-filter: blur(5px);
         }
 
         .slider-toggle:before {
-            background-color: #fff;
-            bottom: 2px;
+            background-color: var(--white, #fff);
+            bottom: 3px;
             content: "";
-            height: 18px;
-            left: 2px;
+            height: 16px;
+            left: 3px;
             position: absolute;
-            transition: .4s;
-            width: 18px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 16px;
             border-radius: 50%;
             z-index: 2;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         input:checked + .slider-toggle {
             background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         input:checked + .slider-toggle:before {
             transform: translateX(22px);
+            background-color: #f3f4f6;
         }
 
         .slider-toggle i {
-            font-size: 10px;
+            font-size: 9px;
             z-index: 1;
         }
         
