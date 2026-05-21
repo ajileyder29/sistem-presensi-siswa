@@ -10,20 +10,23 @@
         :root {
             --primary-color: #4f46e5;
             --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
             --text-color: #1f2937;
             --text-muted: #6b7280;
-            --nav-bg: #ffffff;
+            --nav-bg: rgba(255, 255, 255, 0.7);
             --nav-border: rgba(0,0,0,0.1);
             --table-border: #e5e7eb;
+            --glass-blur: blur(10px);
         }
 
         body.dark {
             --bg-color: #111827;
-            --card-bg: #1f2937;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --modal-bg: #1f2937;
             --text-color: #f3f4f6;
             --text-muted: #9ca3af;
-            --nav-bg: #1f2937;
+            --nav-bg: rgba(15, 23, 42, 0.6);
             --nav-border: rgba(255,255,255,0.1);
             --table-border: #374151;
         }
@@ -39,6 +42,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--nav-border);
+            backdrop-filter: var(--glass-blur);
             position: sticky; top: 0; z-index: 100;
         }
 
@@ -48,6 +52,7 @@
         .main-sidebar {
             width: 250px; background-color: var(--nav-bg); border-right: 1px solid var(--nav-border);
             padding: 15px 0; transition: all 0.3s ease; overflow-x: hidden; white-space: nowrap;
+            backdrop-filter: var(--glass-blur);
         }
         .wrapper.collapsed .main-sidebar { width: 0; border-right: none; }
 
@@ -61,63 +66,17 @@
 
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-add { background-color: var(--primary-color); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-add:hover { opacity: 0.9; }
+        .btn-add { background-color: var(--primary-color); color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
 
         /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 650px;
-            max-height: 90vh;
-            border-radius: 12px;
-            padding: 30px;
-            position: relative;
-            overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--nav-border); padding-bottom: 15px; }
-        .close-modal { background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
-        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 650px; max-height: 90vh; border-radius: 12px; padding: 30px; position: relative; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group-full { grid-column: span 2; }
-        .form-group label, .form-group-full label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--text-color); }
-        .form-group input, .form-group-full input, .form-group-full textarea {
-            width: 100%; padding: 10px; border: 1px solid var(--table-border); border-radius: 6px;
-            background: var(--bg-color); color: var(--text-color); font-size: 0.9rem; outline: none;
-        }
-        .form-group input:focus, .form-group-full input:focus, .form-group-full textarea:focus { border-color: var(--primary-color); }
-        .form-group-full textarea { resize: vertical; min-height: 80px; }
-
-        /* Style for readonly/disabled input */
-        input[readonly] {
-            background-color: var(--bg-color); /* Use a lighter background */
-            color: var(--text-muted); /* Muted text color */
-            cursor: not-allowed; /* Indicate it's not editable */
-        }
-
-        #foto-preview {
-            max-width: 150px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--table-border);
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .form-group-full { grid-column: span 1; }
-        }
+        .form-group label, .form-group-full label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group-full input, .form-group-full textarea { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); }
+        input[readonly] { background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
+        #foto-preview { max-width: 150px; margin-top: 10px; border-radius: 8px; display: none; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--table-border); }
@@ -128,7 +87,72 @@
         .badge-success { background: #dcfce7; color: #166534; }
         .badge-primary { background: #e0e7ff; color: #3730a3; }
 
-        .theme-toggle-nav { background: none; border: 1px solid var(--nav-border); padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--text-color); margin-right: 15px; }
+        /* Theme Toggle Slider in Nav */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 46px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider-toggle {
+            background-color: var(--bg-color);
+            border: 1px solid var(--nav-border);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+        }
+
+        .slider-toggle:before {
+            background-color: #fff;
+            bottom: 2px;
+            content: "";
+            height: 18px;
+            left: 2px;
+            position: absolute;
+            transition: .4s;
+            width: 18px;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider-toggle {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(22px);
+        }
+
+        .slider-toggle i {
+            font-size: 10px;
+            z-index: 1;
+        }
+        
+        .fa-sun { color: #f1c40f; }
+        .fa-moon { color: #6b7280; }
+        body.dark .fa-moon { color: #f3f4f6; }
+
         .btn-logout { padding: 8px 16px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; }
 
         @media (max-width: 768px) {
@@ -145,7 +169,15 @@
             <div class="logo">SekolahKu</div>
         </div>
         <div style="display: flex; align-items: center;">
-            <button class="theme-toggle-nav" id="theme-toggle">🌙</button>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </div>
+                </label>
+            </div>
             <a href="index.html" class="btn-logout">Keluar</a>
         </div>
     </nav>
@@ -169,28 +201,20 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>No</th>
+                            <th>ID Guru</th>
                             <th>NIP</th>
-                            <th>Nama Lengkap</th>
-                            <th>Mata Pelajaran</th>
-                            <th>Status</th>
+                            <th>Nama Guru</th>
+                            <th>Alamat</th>
+                            <th>Tempat Lahir</th>
+                            <th>Tanggal Lahir</th>
+                            <th>No HP</th>
+                            <th>Foto</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>198501012010011001</td>
-                            <td>Budi Santoso, M.Pd.</td>
-                            <td><span class="badge badge-primary">Matematika</span></td>
-                            <td><span class="badge badge-success">Aktif</span></td>
-                            <td><a href="#" style="color: var(--primary-color);"><i class="fas fa-edit"></i></a></td>
-                        </tr>
-                        <tr>
-                            <td>199005122015022003</td>
-                            <td>Siti Aminah, S.Kom.</td>
-                            <td><span class="badge badge-primary">Informatika</span></td>
-                            <td><span class="badge badge-success">Aktif</span></td>
-                            <td><a href="#" style="color: var(--primary-color);"><i class="fas fa-edit"></i></a></td>
-                        </tr>
+                    <tbody id="table-body-guru">
+                        <!-- Data guru akan dimuat secara dinamis dari Supabase -->
                     </tbody>
                 </table>
             </div>
@@ -200,55 +224,28 @@
     <!-- Modal Tambah Guru -->
     <div class="modal-overlay" id="modal-guru">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                 <h3>Tambah Data Guru</h3>
-                <button class="close-modal" id="close-modal-btn">&times;</button>
+                <button id="close-modal-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-color);">&times;</button>
             </div>
             <form id="form-guru">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>ID Guru</label>
-                        <input type="text" id="id_guru" name="id_guru" placeholder="Otomatis" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nama Lengkap</label>
-                        <input type="text" name="nama_guru" placeholder="Masukkan nama" required>
-                    </div>
-                    <div class="form-group">
-                        <label>NIP</label>
-                        <input type="text" name="nip_guru" placeholder="Masukkan NIP" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir" placeholder="Kota lahir" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Lahir</label>
-                        <input type="date" name="tgl_lahir" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Nomor HP</label>
-                        <input type="tel" name="no_hp_guru" placeholder="08xxxxxxxxxx" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" name="username_guru" placeholder="Untuk login" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="pass_guru" placeholder="********" required>
-                    </div>
-                    <div class="form-group-full">
-                        <label>Alamat</label>
-                        <textarea name="alamat_guru" rows="3" placeholder="Alamat lengkap" required></textarea>
-                    </div>
+                    <div class="form-group"><label>ID Guru</label><input type="text" id="id_guru" name="id_guru" readonly required></div>
+                    <div class="form-group"><label>Nama Lengkap</label><input type="text" name="nama_guru" required></div>
+                    <div class="form-group"><label>NIP</label><input type="text" name="nip_guru" required></div>
+                    <div class="form-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir" required></div>
+                    <div class="form-group"><label>Tanggal Lahir</label><input type="date" name="tgl_lahir" required></div>
+                    <div class="form-group"><label>Nomor HP</label><input type="tel" name="no_hp_guru" required></div>
+                    <div class="form-group"><label>Username</label><input type="text" name="username_guru" required></div>
+                    <div class="form-group"><label>Password</label><input type="password" name="pass_guru" required></div>
+                    <div class="form-group-full"><label>Alamat</label><textarea name="alamat_guru" rows="3" required></textarea></div>
                     <div class="form-group-full">
                         <label>Foto Guru</label>
                         <input type="file" id="input-foto" name="foto" accept="image/*">
-                        <img id="foto-preview" src="" alt="Preview Foto">
+                        <img id="foto-preview">
                     </div>
                 </div>
-                <button type="submit" class="btn-add" style="width: 100%; margin-top: 20px; justify-content: center;">Simpan Data</button>
+                <button type="submit" class="btn-add" style="width:100%; margin-top:20px; justify-content:center;">Simpan Data</button>
             </form>
         </div>
     </div>
@@ -293,150 +290,119 @@
         }
         window.addEventListener('resize', initCanvas); initCanvas(); createParticles(); animate();
 
-        // Supabase Configuration
+        // Supabase Config
         const SB_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_guru";
+        const SB_STORAGE = "https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/assets";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
-        const SB_STORAGE_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/assets";
 
-        // Form Submission Logic
-        const formGuru = document.getElementById('form-guru');
-        formGuru.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = formGuru.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerText;
-            
+        // Fungsi untuk mengambil dan menampilkan data guru dari Supabase
+        async function fetchGuruData() {
+            const tbody = document.getElementById('table-body-guru');
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Memuat data...</td></tr>';
             try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "Menyimpan...";
-
-                const formData = new FormData(formGuru);
-                const data = Object.fromEntries(formData.entries());
-
-                // Handle Photo upload to Storage Bucket if exists
-                if (data.foto && data.foto.size > 0) {
-                    const file = data.foto;
-                    const fileName = `${Date.now()}_${file.name}`;
-                    const uploadUrl = `${SB_STORAGE_URL}/${fileName}`;
-
-                    const uploadResponse = await fetch(uploadUrl, {
-                        method: 'POST',
-                        headers: {
-                            'apikey': SB_KEY,
-                            'Authorization': `Bearer ${SB_KEY}`,
-                            'Content-Type': file.type
-                        },
-                        body: file
-                    });
-
-                    if (!uploadResponse.ok) {
-                        const uploadErr = await uploadResponse.json();
-                        throw new Error(uploadErr.message || 'Gagal mengunggah foto ke storage');
-                    }
-
-                    // Simpan Public URL ke database
-                    data.foto = `https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/public/assets/${fileName}`;
-                } else {
-                    delete data.foto;
-                }
-
-                const response = await fetch(SB_URL, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SB_KEY,
-                        'Authorization': `Bearer ${SB_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(data)
+                const res = await fetch(`${SB_URL}?select=*`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
-
-                if (response.ok) {
-                    alert('Data Guru berhasil disimpan ke Supabase!');
-                    modal.style.display = 'none';
-                    formGuru.reset();
-                    document.getElementById('foto-preview').style.display = 'none';
-                    // Anda bisa menambahkan fungsi refresh tabel di sini jika diperlukan
-                    location.reload(); 
-                } else {
-                    const err = await response.json();
-                    throw new Error(err.message || 'Gagal menyimpan data');
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Gagal mengambil data");
                 }
-
-            } catch (error) {
-                console.error("Error:", error);
-                alert('Terjadi kesalahan: ' + error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalBtnText;
-            }
-        });
-
-        // Modal Logic
-        const modal = document.getElementById('modal-guru');
-        const btnTambah = document.getElementById('btn-tambah-guru');
-        const btnClose = document.getElementById('close-modal-btn');
-        const idGuruInput = document.getElementById('id_guru');
-
-        // Function to generate Auto ID
-        function generateAutoID() {
-            const now = new Date();
-            const dd = String(now.getDate()).padStart(2, '0');
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const yy = String(now.getFullYear()).slice(-2);
-            
-            // 4 digit random number
-            const randomDigits = Math.floor(1000 + Math.random() * 9000);
-            
-            const generatedID = `IDG.${dd}${mm}${yy}-${randomDigits}`;
-            idGuruInput.value = generatedID;
+                const teachers = await res.json();
+                tbody.innerHTML = '';
+                if (teachers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Belum ada data guru.</td></tr>';
+                    return;
+                }
+                teachers.forEach((teacher, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${teacher.id_guru || '-'}</td>
+                            <td>${teacher.nip || '-'}</td>
+                            <td>${teacher.nama_guru || '-'}</td>
+                            <td>${teacher.alamat_guru || '-'}</td>
+                            <td>${teacher.tempat_lahir || '-'}</td>
+                            <td>${teacher.tanggal_lahir || '-'}</td>
+                            <td>${teacher.no_hp || '-'}</td>
+                            <td>
+                                ${teacher.foto ? `<img src="${teacher.foto}" alt="Foto ${teacher.nama_guru}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">` : '<span class="text-muted">No Photo</span>'}
+                            </td>
+                            <td><a href="#" style="color: var(--primary-color);"><i class="fas fa-edit"></i></a></td>
+                        </tr>`;
+                });
+            } catch (err) { tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">${err.message}</td></tr>`; }
         }
+        fetchGuruData();
 
-        btnTambah.addEventListener('click', () => {
-            generateAutoID(); // Generate ID when modal opens
+        // Modal & ID Gen Logic
+        const modal = document.getElementById('modal-guru');
+        const idInput = document.getElementById('id_guru');
+        document.getElementById('btn-tambah-guru').onclick = () => {
+            const n = new Date();
+            const r = Math.floor(1000 + Math.random() * 9000);
+            idInput.value = `IDG.${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}-${r}`;
             modal.style.display = 'flex';
-        });
+        };
+        document.getElementById('close-modal-btn').onclick = () => modal.style.display = 'none';
 
-        btnClose.addEventListener('click', () => {
-            modal.style.display = 'none';
-            document.getElementById('form-guru').reset();
-            const previewFoto = document.getElementById('foto-preview');
-            previewFoto.style.display = 'none';
-            previewFoto.src = "";
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        // Photo Preview Logic
+        // Preview Logic
         const inputFoto = document.getElementById('input-foto');
         const previewFoto = document.getElementById('foto-preview');
-
-        inputFoto.addEventListener('change', function() {
+        inputFoto.onchange = function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewFoto.src = e.target.result;
-                    previewFoto.style.display = 'block';
-                }
+                reader.onload = e => { previewFoto.src = e.target.result; previewFoto.style.display = 'block'; };
                 reader.readAsDataURL(file);
-            } else {
-                previewFoto.src = "";
-                previewFoto.style.display = 'none';
             }
-        });
+        };
 
-        const themeToggle = document.getElementById('theme-toggle');
-        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark'); themeToggle.innerText = '☀️'; }
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
+        // Submit Logic
+        document.getElementById('form-guru').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = "Processing...";
+
+            try {
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                if (data.foto && data.foto.size > 0) {
+                    const fileName = `${Date.now()}_${data.foto.name}`;
+                    const up = await fetch(`${SB_STORAGE}/${fileName}`, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': data.foto.type },
+                        body: data.foto
+                    });
+                    if (!up.ok) throw new Error("Upload failed");
+                    data.foto = `https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/public/assets/${fileName}`;
+                } else { delete data.foto; }
+
+                const res = await fetch(SB_URL, {
+                    method: 'POST',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) { alert("Data Saved!"); location.reload(); }
+                else {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Gagal menyimpan ke database");
+                }
+            } catch (err) { alert(err.message); }
+            finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
+        };
+
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            themeCheckbox.checked = true;
+        }
+        themeCheckbox.addEventListener('change', () => {
+            const isDark = themeCheckbox.checked;
+            document.body.classList.toggle('dark', isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeToggle.innerText = isDark ? '☀️' : '🌙';
         });
         const urlParams = new URLSearchParams(window.location.search);
         const role = urlParams.get('role') || 'User';
