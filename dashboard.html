@@ -96,25 +96,32 @@
         }
 
         .nav-item a {
-            padding: 8px 15px;
+            padding: 12px 18px;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            gap: 6px;
             color: var(--text-color);
             text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 12px;
         }
 
         .nav-item i {
-            width: 30px;
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             color: var(--primary-color);
+            transition: transform 0.3s ease;
         }
 
         .nav-item a:hover, .nav-item.active a {
             background: rgba(79, 70, 229, 0.1);
-            border-bottom: 3px solid var(--primary-color);
-            border-radius: 4px 4px 0 0;
+            transform: translateY(-2px);
+        }
+        
+        .nav-item a:hover i {
+            transform: scale(1.1);
         }
 
         .btn-logout {
@@ -188,14 +195,32 @@
         h1 { margin-bottom: 10px; }
         p { color: var(--text-muted); }
 
-        /* Penyesuaian Mobile */
-        @media (max-width: 600px) {
+        /* Penyesuaian Responsif & Elegant Mobile Dock */
+        @media (max-width: 768px) {
             nav { padding: 15px 20px; }
             .logo { font-size: 1rem; }
-            .content { padding: 20px 15px; }
+            .content { padding: 20px 15px 100px 15px; } /* Padding bawah untuk Dock */
             .welcome-card h1 { font-size: 1.4rem; }
             .info-box-icon { width: 60px; height: 60px; font-size: 1.4rem; }
-            .nav-item i { width: 20px; font-size: 1rem; margin-right: 5px; }
+            
+            /* Floating Dock Menu */
+            .main-sidebar {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92%;
+                max-width: 500px;
+                border-radius: 25px;
+                border: 1px solid var(--nav-border);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                padding: 8px 0;
+                margin: 0;
+                background: var(--nav-bg);
+            }
+            .nav-sidebar { justify-content: space-evenly; flex-wrap: nowrap; gap: 0; }
+            .nav-item a { padding: 5px; font-size: 0.65rem; min-width: 60px; }
+            .nav-item i { font-size: 1.2rem; }
         }
 
         /* Theme Toggle Slider in Nav */
