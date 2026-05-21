@@ -41,12 +41,12 @@
 
         body {
             background: var(--bg-gradient) fixed;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            overflow: hidden; /* Mencegah scroll karena canvas */
+            overflow-x: hidden;
         }
 
         #bg-canvas {
@@ -266,8 +266,10 @@
         /* Responsif untuk layar sangat kecil */
         @media (max-width: 480px) {
             .login-card {
-                padding: 30px 20px;
+                padding: 25px 15px;
             }
+            .logo-login { font-size: 1.2rem; }
+            .btn-login { font-size: 0.9rem; }
         }
     </style>
 </head>
