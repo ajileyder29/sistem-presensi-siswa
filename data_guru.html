@@ -66,7 +66,14 @@
 
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-add { background-color: var(--primary-color); color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .btn-add { background-color: var(--primary-color); color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+
+        /* Table Responsiveness */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
 
         /* Modal Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
@@ -77,6 +84,14 @@
         .form-group input, .form-group-full input, .form-group-full textarea { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); }
         input[readonly] { background-color: rgba(0,0,0,0.05); cursor: not-allowed; }
         #foto-preview { max-width: 150px; margin-top: 10px; border-radius: 8px; display: none; }
+
+        @media (max-width: 600px) {
+            nav { padding: 15px 20px; }
+            .content { padding: 15px; }
+            .card { padding: 15px; }
+            .card-header h2 { font-size: 1.1rem; }
+            .nav-item a { padding: 8px 12px; font-size: 0.8rem; }
+        }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--table-border); }
@@ -201,25 +216,27 @@
                     <h2>Daftar Data Guru</h2>
                     <button id="btn-tambah-guru" class="btn-add"><i class="fas fa-plus"></i> Tambah Guru</button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>ID Guru</th>
-                            <th>NIP</th>
-                            <th>Nama Guru</th>
-                            <th>Alamat</th>
-                            <th>Tempat Lahir</th>
-                            <th>Tanggal Lahir</th>
-                            <th>No HP</th>
-                            <th>Foto</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body-guru">
-                        <!-- Data guru akan dimuat secara dinamis dari Supabase -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>ID Guru</th>
+                                <th>NIP</th>
+                                <th>Nama Guru</th>
+                                <th>Alamat</th>
+                                <th>Tempat Lahir</th>
+                                <th>Tanggal Lahir</th>
+                                <th>No HP</th>
+                                <th>Foto</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-guru">
+                            <!-- Data guru akan dimuat secara dinamis dari Supabase -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -411,11 +428,6 @@
         const role = urlParams.get('role') || 'User';
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
-        document.getElementById('sidebar-toggle').addEventListener('click', () => {
-            const wrapper = document.querySelector('.wrapper');
-            if (window.innerWidth <= 768) wrapper.classList.toggle('sidebar-open');
-            else wrapper.classList.toggle('collapsed');
-        });
     </script>
 </body>
 </html>
