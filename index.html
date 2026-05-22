@@ -72,6 +72,41 @@
             backdrop-filter: blur(10px);
         }
 
+        .login-logo {
+            max-width: 140px; /* Adjust as needed */
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto; /* Center the logo and add bottom margin */
+        }
+        
+        .system-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+            margin-top: -10px;
+        }
+        .system-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .login-hints {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--selector-bg);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+            border: 1px dashed var(--input-border);
+            line-height: 1.6;
+        }
+        .login-hints strong {
+            color: var(--primary-color);
+        }
+
         .logo-login {
             font-weight: 600;
             font-size: 1.5rem;
@@ -289,9 +324,16 @@
     </div>
 
     <div class="login-card">
-        <div class="logo-login">SekolahKu</div>
-        <h2>Selamat Datang</h2>
-        <p>Silakan masuk ke akun Anda</p>
+        <div class="logo-login" style="margin-bottom: 0;">
+            <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="login-logo">
+        </div>
+        <div class="system-title">SISISWA</div>
+        <div class="system-subtitle">(Sistem Absensi Siswa)</div>
+
+        <div class="login-hints">
+            <div style="margin-bottom: 5px;"><strong>Akses Guru:</strong> <code>guru</code> / <code>guru123</code></div>
+            <div><strong>Akses Admin:</strong> <code>admin</code> / <code>admin123</code></div>
+        </div>
 
         <form action="#" method="POST">
             <!-- Pilihan Role -->
@@ -323,7 +365,7 @@
         </form>
 
         <div class="footer-text">
-            &copy; 2024 Sistem Informasi Sekolah. All rights reserved.
+            &copy; SISISWA - SMK Negeri 1 Parittiga
         </div>
     </div>
 
