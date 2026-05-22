@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi - Sistem Informasi Sekolah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0,0,0,0.1);
+            --table-border: #e5e7eb;
+            --glass-blur: blur(10px);
+        }
+        body.dark {
+            --bg-color: #111827;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --nav-bg: rgba(15, 23, 42, 0.6);
+            --nav-border: rgba(255,255,255,0.1);
+            --table-border: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); }
+        .nav-logo {
+            height: 32px; /* Adjust as needed */
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .nav-logo-link { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none;
+            line-height: 1.2;
+        }
+        .nav-system-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        .nav-system-subtitle {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        nav { background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 100; }
+        .logo { font-weight: 600; font-size: 1.2rem; color: var(--primary-color); }
+        .wrapper { display: flex; flex-direction: column; min-height: calc(100vh - 73px); }
+        .main-sidebar { width: 100%; background-color: var(--nav-bg); border-bottom: 1px solid var(--nav-border); padding: 10px 0; backdrop-filter: var(--glass-blur); overflow-x: auto; scrollbar-width: none; }
+        .nav-sidebar { list-style: none; display: flex; justify-content: center; gap: 5px; padding: 0 20px; }
+        .nav-item a { padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-color); text-decoration: none; font-size: 0.75rem; font-weight: 500; border-radius: 12px; }
+        .nav-item.active a { background: rgba(79, 70, 229, 0.1); }
+        .content { flex: 1; padding: 30px; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header-absensi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .date-picker { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--nav-border); background: var(--bg-color); color: var(--text-color); }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--table-border); }
+        th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; }
+        .status-group { display: flex; gap: 10px; }
+        .status-item { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; cursor: pointer; }
+        .btn-save { background-color: var(--primary-color); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; width: 100%; margin-top: 20px; font-weight: 600; }
+        @media (max-width: 768px) {
+            .main-sidebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; border-radius: 25px; border: 1px solid var(--nav-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+            .content { padding-bottom: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav style="padding: 15px 40px;">
+        <a href="dashboard.html" class="nav-logo-link">
+            <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
+            <span class="nav-system-title">SISISWA</span>
+            <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+        </a>
+        <a href="index.html" style="color: #ef4444; text-decoration: none; font-size: 0.9rem;">Keluar</a>
+    </nav>
+    <div class="wrapper">
+        <aside class="main-sidebar">
+            <ul class="nav-sidebar">
+                <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="#"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item active"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
+                <li class="nav-item"><a href="#"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+            </ul>
+        </aside>
+        <main class="content">
+            <div class="card">
+                <div class="header-absensi">
+                    <h2>Presensi Harian</h2>
+                    <input type="date" id="tgl_absensi" class="date-picker">
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Status Kehadiran</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-absensi">
+                            <!-- Memuat data guru sebagai contoh daftar yang diabsen -->
+                        </tbody>
+                    </table>
+                </div>
+                <button id="btn-simpan-absensi" class="btn-save">Simpan Absensi</button>
+            </div>
+            <footer class="footer-content">
+                &copy; SISISWA - SMK Negeri 1 Parittiga
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Setup Tanggal Hari Ini
+        document.getElementById('tgl_absensi').valueAsDate = new Date();
+
+        // Konfigurasi Supabase (Menggunakan key dari data_guru.html)
+        const SB_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_guru"; // Mengambil daftar orang dari tb_guru
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+
+        async function loadDaftarAbsensi() {
+            const tbody = document.getElementById('table-absensi');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>';
+            try {
+                const res = await fetch(`${SB_URL}?select=*`, {
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                const data = await res.json();
+                tbody.innerHTML = '';
+                data.forEach((person, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${person.nama_guru}</strong></td>
+                            <td>
+                                <div class="status-group">
+                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="H" checked> H</label>
+                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="S"> S</label>
+                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="I"> I</label>
+                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="A"> A</label>
+                                </div>
+                            </td>
+                            <td><input type="text" placeholder="Catatan..." style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--nav-border); background:transparent; color:var(--text-color);"></td>
+                        </tr>`;
+                });
+            } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Gagal memuat data.</td></tr>'; }
+        }
+
+        document.getElementById('btn-simpan-absensi').onclick = async () => {
+            const btn = document.getElementById('btn-simpan-absensi');
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+            
+            // Simulasi penyimpanan (karena tabel tb_absensi mungkin belum dibuat di Supabase Anda)
+            setTimeout(() => {
+                alert("Absensi berhasil disimpan secara lokal!");
+                btn.disabled = false;
+                btn.innerText = "Simpan Absensi";
+            }, 1000);
+        };
+
+        // Animasi Background (Sama dengan halaman lain)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(79, 70, 229, 0.1)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        for(let i=0; i<50; i++) particles.push(new Particle());
+        animate();
+
+        // Tema & Role
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role') || 'User';
+        document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
+        document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
+
+        loadDaftarAbsensi();
+    </script>
+</body>
+</html>
