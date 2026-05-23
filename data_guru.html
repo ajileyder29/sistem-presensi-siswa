@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Guru - Sistem Informasi Sekolah</title>
+    <title>SISISWA - SMKN 1 Parittiga</title>
+    <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -183,6 +184,51 @@
         th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
         tr:hover { background-color: rgba(79, 70, 229, 0.02); }
         td { font-size: 0.9rem; }
+        
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 0.9rem;
+        }
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+
+        /* Toast & Confirm Styles */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { 
+            background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; 
+            border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px; 
+            border-left: 4px solid var(--primary-color); transform: translateX(120%); transition: all 0.3s ease; 
+            backdrop-filter: blur(10px);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+
+        .confirm-content { 
+            text-align: center; max-width: 400px !important; 
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .icon-warning { font-size: 4rem; color: #ef4444; margin-bottom: 15px; }
+        .btn-cancel { background: var(--bg-color); color: var(--text-color); }
 
         .footer-content {
             margin-top: 30px;
@@ -335,7 +381,7 @@
     <div class="modal-overlay" id="modal-guru">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h3>Tambah Data Guru</h3>
+                <h3 id="modal-title">Tambah Data Guru</h3>
                 <button id="close-modal-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-color);">&times;</button>
             </div>
             <form id="form-guru">
@@ -359,6 +405,24 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content confirm-content">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 style="margin-bottom: 10px;">Hapus Data Guru?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">
+                Data yang dihapus tidak dapat dipulihkan kembali. Foto terkait juga akan dihapus dari server.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-action btn-cancel" id="cancel-delete" style="width: auto; padding: 10px 25px;">Batal</button>
+                <button class="btn-action btn-delete" id="confirm-delete-btn" style="width: auto; padding: 10px 25px;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Notifikasi -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script>
         const canvas = document.getElementById('bg-canvas');
@@ -405,6 +469,13 @@
         const SB_STORAGE = "https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/assets";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
 
+        // Helper function untuk format tanggal YYYY-MM-DD ke DD-MM-YYYY
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '-') return '-';
+            const [y, m, d] = dateStr.split('-');
+            return `${d}-${m}-${y}`;
+        }
+
         // Fungsi untuk mengambil dan menampilkan data guru dari Supabase
         async function fetchGuruData() {
             const tbody = document.getElementById('table-body-guru');
@@ -429,16 +500,25 @@
                         <tr>
                             <td>${index + 1}</td>
                             <td>${teacher.id_guru || '-'}</td>
-                            <td>${teacher.nip || '-'}</td>
+                            <td>${teacher.nip_guru || '-'}</td>
                             <td>${teacher.nama_guru || '-'}</td>
                             <td>${teacher.alamat_guru || '-'}</td>
                             <td>${teacher.tempat_lahir || '-'}</td>
-                            <td>${teacher.tanggal_lahir || '-'}</td>
-                            <td>${teacher.no_hp || '-'}</td>
+                            <td>${formatDate(teacher.tgl_lahir)}</td>
+                            <td>${teacher.no_hp_guru || '-'}</td>
                             <td>
                                 ${teacher.foto ? `<img src="${teacher.foto}" alt="Foto ${teacher.nama_guru}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">` : '<span class="text-muted">No Photo</span>'}
                             </td>
-                            <td><a href="#" style="color: var(--primary-color);"><i class="fas fa-edit"></i></a></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-action btn-edit" onclick="editGuru('${teacher.id_guru}')" title="Edit Data">
+                                        <i class="fas fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteGuru('${teacher.id_guru}')" title="Hapus Data">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>`;
                 });
             } catch (err) { tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">${err.message}</td></tr>`; }
@@ -448,7 +528,121 @@
         // Modal & ID Gen Logic
         const modal = document.getElementById('modal-guru');
         const idInput = document.getElementById('id_guru');
+        const confirmModal = document.getElementById('confirm-modal');
+        let teacherIdToDelete = null;
+        let isEditMode = false;
+        let currentPhotoUrl = "";
+
+        // Global Notification Function
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Trigger Delete Modal
+        function deleteGuru(id) {
+            teacherIdToDelete = id;
+            confirmModal.style.display = 'flex';
+        }
+
+        document.getElementById('cancel-delete').onclick = () => confirmModal.style.display = 'none';
+
+        document.getElementById('confirm-delete-btn').onclick = async () => {
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                // 1. Ambil info foto
+                const getRes = await fetch(`${SB_URL}?id_guru=eq.${teacherIdToDelete}&select=foto`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                const teacherData = await getRes.json();
+
+                // 2. Hapus file Storage
+                if (teacherData && teacherData.length > 0 && teacherData[0].foto) {
+                    const fileName = teacherData[0].foto.split('/').pop();
+                    await fetch(`${SB_STORAGE}/${fileName}`, {
+                        method: 'DELETE',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                    });
+                }
+
+                // 3. Hapus Row Database
+                const res = await fetch(`${SB_URL}?id_guru=eq.${teacherIdToDelete}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+
+                if (res.ok) {
+                    showToast("Data dan foto berhasil dihapus!");
+                    fetchGuruData();
+                } else {
+                    throw new Error("Gagal menghapus data.");
+                }
+            } catch (err) { showToast(err.message, 'error'); }
+            finally {
+                btn.disabled = false;
+                btn.innerText = "Ya, Hapus";
+                confirmModal.style.display = 'none';
+            }
+        };
+
+        // Fungsi Edit Data (Placeholder)
+        async function editGuru(id) {
+            isEditMode = true;
+            document.getElementById('modal-title').innerText = "Edit Data Guru";
+            
+            try {
+                const res = await fetch(`${SB_URL}?id_guru=eq.${id}`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                const data = await res.json();
+                if (data.length > 0) {
+                    const guru = data[0];
+                    const form = document.getElementById('form-guru');
+                    
+                    form.id_guru.value = guru.id_guru;
+                    form.nama_guru.value = guru.nama_guru;
+                    form.nip_guru.value = guru.nip_guru;
+                    form.tempat_lahir.value = guru.tempat_lahir;
+                    form.tgl_lahir.value = guru.tgl_lahir;
+                    form.no_hp_guru.value = guru.no_hp_guru;
+                    form.username_guru.value = guru.username_guru;
+                    form.pass_guru.value = guru.pass_guru;
+                    form.alamat_guru.value = guru.alamat_guru;
+                    
+                    currentPhotoUrl = guru.foto || "";
+                    if (currentPhotoUrl) {
+                        previewFoto.src = currentPhotoUrl;
+                        previewFoto.style.display = 'block';
+                    } else {
+                        previewFoto.style.display = 'none';
+                    }
+                    
+                    modal.style.display = 'flex';
+                }
+            } catch (err) { showToast("Gagal mengambil data: " + err.message, "error"); }
+        }
+
         document.getElementById('btn-tambah-guru').onclick = () => {
+            isEditMode = false;
+            document.getElementById('modal-title').innerText = "Tambah Data Guru";
+            document.getElementById('form-guru').reset();
+            previewFoto.style.display = 'none';
+            currentPhotoUrl = "";
+            
             const n = new Date();
             const r = Math.floor(1000 + Math.random() * 9000);
             idInput.value = `IDG.${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}-${r}`;
@@ -472,13 +666,22 @@
         document.getElementById('form-guru').onsubmit = async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.innerText = "Processing...";
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             try {
                 const formData = new FormData(e.target);
                 const data = Object.fromEntries(formData.entries());
 
                 if (data.foto && data.foto.size > 0) {
+                    // Jika sedang mengedit dan ada foto lama, hapus file lama dari storage
+                    if (isEditMode && currentPhotoUrl) {
+                        const oldFileName = currentPhotoUrl.split('/').pop();
+                        await fetch(`${SB_STORAGE}/${oldFileName}`, {
+                            method: 'DELETE',
+                            headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                        });
+                    }
+
                     const fileName = `${Date.now()}_${data.foto.name}`;
                     const up = await fetch(`${SB_STORAGE}/${fileName}`, {
                         method: 'POST',
@@ -487,20 +690,36 @@
                     });
                     if (!up.ok) throw new Error("Upload failed");
                     data.foto = `https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/public/assets/${fileName}`;
-                } else { delete data.foto; }
+                } else { 
+                    if (isEditMode) data.foto = currentPhotoUrl;
+                    else delete data.foto; 
+                }
 
-                const res = await fetch(SB_URL, {
-                    method: 'POST',
-                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                    body: JSON.stringify(data)
-                });
+                let res;
+                if (isEditMode) {
+                    res = await fetch(`${SB_URL}?id_guru=eq.${data.id_guru}`, {
+                        method: 'PATCH',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    res = await fetch(SB_URL, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(data)
+                    });
+                }
 
-                if (res.ok) { alert("Data Saved!"); location.reload(); }
+                if (res.ok) { 
+                    showToast(isEditMode ? "Data berhasil diperbarui!" : "Data berhasil disimpan!"); 
+                    modal.style.display = 'none';
+                    fetchGuruData();
+                }
                 else {
                     const errorData = await res.json();
-                    throw new Error(errorData.message || "Gagal menyimpan ke database");
+                    throw new Error(errorData.message || "Gagal memproses data");
                 }
-            } catch (err) { alert(err.message); }
+            } catch (err) { showToast(err.message, "error"); }
             finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
         };
 
