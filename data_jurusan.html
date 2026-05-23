@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISISWA - SMKN 1 Parittiga</title>
+    <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0,0,0,0.1);
+            --table-border: #e5e7eb;
+            --glass-blur: blur(10px);
+        }
+        body.dark {
+            --bg-color: #111827;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --modal-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --nav-bg: rgba(15, 23, 42, 0.6);
+            --nav-border: rgba(255,255,255,0.1);
+            --table-border: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        nav {
+            background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo { height: 32px; width: auto; }
+        .nav-logo-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.2; }
+        .nav-system-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; margin-top: 4px; }
+        .nav-system-subtitle { font-size: 0.55rem; color: var(--text-muted); font-weight: 400; }
+        .wrapper { display: flex; flex-direction: column; min-height: calc(100vh - 73px); }
+        .main-sidebar {
+            width: 100%; background-color: var(--nav-bg); border-bottom: 1px solid var(--nav-border);
+            padding: 10px 0; transition: all 0.3s ease; backdrop-filter: var(--glass-blur);
+            overflow-x: auto; scrollbar-width: none; z-index: 10;
+        }
+        .main-sidebar::-webkit-scrollbar { display: none; }
+        .nav-sidebar { list-style: none; display: flex; justify-content: center; flex-wrap: nowrap; gap: 5px; padding: 0 20px; }
+        .nav-item a { padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-color); text-decoration: none; font-size: 0.75rem; font-weight: 500; border-radius: 12px; transition: all 0.3s ease; white-space: nowrap; }
+        .nav-item i { font-size: 1.4rem; color: var(--primary-color); transition: transform 0.3s ease; }
+        .nav-item a:hover, .nav-item.active a { background: rgba(79, 70, 229, 0.1); transform: translateY(-2px); }
+        .nav-item a:hover i { transform: scale(1.1); }
+        .content { flex: 1; padding: 30px; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%);
+            color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .btn-add:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
+        .btn-add:active { transform: scale(0.95); }
+        .table-container { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--table-border); }
+        table { width: 100%; border-collapse: collapse; background: transparent; }
+        th { background: rgba(79, 70, 229, 0.05); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; padding: 15px 20px; text-align: left; border-bottom: 2px solid rgba(79, 70, 229, 0.1); }
+        td { padding: 15px 20px; border-bottom: 1px solid var(--table-border); font-size: 0.85rem; }
+        tr:hover { background-color: rgba(79, 70, 229, 0.04); transition: all 0.2s ease; }
+        .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; }
+        .btn-action:active { transform: scale(0.92); }
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-logout { padding: 8px 16px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-logout:active { transform: scale(0.92); }
+        .theme-switch-wrapper { display: flex; align-items: center; margin-right: 15px; }
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 46px; }
+        .theme-switch input { display: none; }
+        .slider-toggle { background-color: var(--nav-border); border: 1px solid var(--nav-border); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; backdrop-filter: blur(5px); }
+        .slider-toggle:before { background-color: #fff; bottom: 3px; content: ""; height: 16px; left: 3px; position: absolute; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); width: 16px; border-radius: 50%; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        input:checked + .slider-toggle { background-color: var(--primary-color); }
+        input:checked + .slider-toggle:before { transform: translateX(22px); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); outline: none; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border-left: 4px solid #10b981; transform: translateX(120%); transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: #ef4444; }
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .content { padding: 20px 15px 100px 15px; }
+            .main-sidebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); padding: 8px 0; background: var(--nav-bg); }
+            .nav-sidebar { justify-content: flex-start; padding: 0 15px; }
+            .nav-item a { padding: 8px 12px; font-size: 0.65rem; min-width: 70px; }
+            .nav-item i { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav>
+        <div style="display: flex; align-items: center;">
+            <a href="dashboard.html" class="nav-logo-link">
+                <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
+                <span class="nav-system-title">SISISWA</span>
+                <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+            </a>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun" style="color: #f1c40f;"></i>
+                    </div>
+                </label>
+            </div>
+            <a href="index.html" class="btn-logout">Keluar</a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <aside class="main-sidebar">
+            <ul class="nav-sidebar">
+                <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item active"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Jurusan Aktif</h2>
+                    <button id="btn-tambah-jurusan" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Jurusan</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Kode Jurusan</th>
+                                <th>Nama Jurusan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-jurusan"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="modal-jurusan">
+        <div class="modal-content">
+            <h3 id="modal-title" style="margin-bottom: 20px;">Tambah Jurusan</h3>
+            <form id="form-jurusan">
+                <input type="hidden" name="id_jurusan">
+                <div class="form-group">
+                    <label>Kode Jurusan</label>
+                    <input type="text" name="kode_jurusan" required placeholder="Contoh: TKJ" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Nama Jurusan</label>
+                    <input type="text" name="nama_jurusan" required placeholder="Contoh: Teknik Komputer dan Jaringan">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-add" id="btn-close-modal" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
+                    <button type="submit" class="btn-add" style="flex:2; justify-content:center;">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content" style="text-align: center; max-width: 400px;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+            <h3>Hapus Jurusan?</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 20px;">Menghapus jurusan dapat mempengaruhi data kelas dan siswa terkait.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-add" id="cancel-delete" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
+                <button class="btn-add" id="confirm-delete-btn" style="background:#ef4444; flex:1; justify-content:center;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        const SB_URL_JURUSAN = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_jurusan";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+
+        let isEditMode = false;
+        let jurusanIdToDelete = null;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        async function fetchJurusanData() {
+            const tbody = document.getElementById('table-body-jurusan');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Memuat data...</td></tr>';
+            try {
+                const res = await fetch(`${SB_URL_JURUSAN}?select=*&order=kode_jurusan.asc`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                
+                if (!res.ok) throw new Error("Gagal mengambil data dari database.");
+                
+                const data = await res.json();
+                tbody.innerHTML = '';
+                if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Belum ada data jurusan.</td></tr>'; return; }
+
+                data.forEach((j, idx) => {
+                    tbody.innerHTML += `<tr>
+                        <td>${idx + 1}</td>
+                        <td><strong style="color:var(--primary-color)">${j.kode_jurusan}</strong></td>
+                        <td>${j.nama_jurusan}</td>
+                        <td>
+                            <div style="display:flex; gap:8px">
+                                <button class="btn-action btn-edit" onclick="editJurusan('${j.id_jurusan}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete" onclick="triggerDelete('${j.id_jurusan}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        const modal = document.getElementById('modal-jurusan');
+        document.getElementById('btn-tambah-jurusan').onclick = () => {
+            isEditMode = false;
+            document.getElementById('modal-title').innerText = "Tambah Jurusan";
+            document.getElementById('form-jurusan').reset();
+            
+            // Generate ID Otomatis: JUR.XXXXX
+            const randomNum = Math.floor(10000 + Math.random() * 90000);
+            document.querySelector('input[name="id_jurusan"]').value = `JUR.${randomNum}`;
+            
+            modal.style.display = 'flex';
+        };
+        document.getElementById('btn-close-modal').onclick = () => modal.style.display = 'none';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+        // Menutup modal konfirmasi hapus jika klik di luar
+        const confirmModal = document.getElementById('confirm-modal');
+        confirmModal.onclick = (e) => { if (e.target === confirmModal) confirmModal.style.display = 'none'; };
+
+        async function editJurusan(id) {
+            isEditMode = true;
+            document.getElementById('modal-title').innerText = "Edit Jurusan";
+            try {
+                const res = await fetch(`${SB_URL_JURUSAN}?id_jurusan=eq.${encodeURIComponent(id)}`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                
+                if (!res.ok) throw new Error("Gagal mengambil detail data.");
+                
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    const j = data[0];
+                    const form = document.getElementById('form-jurusan');
+                    form.id_jurusan.value = j.id_jurusan;
+                    form.kode_jurusan.value = j.kode_jurusan;
+                    form.nama_jurusan.value = j.nama_jurusan;
+                    modal.style.display = 'flex';
+                }
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function triggerDelete(id) { jurusanIdToDelete = id; document.getElementById('confirm-modal').style.display = 'flex'; }
+        document.getElementById('cancel-delete').onclick = () => document.getElementById('confirm-modal').style.display = 'none';
+        document.getElementById('confirm-delete-btn').onclick = async () => {
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const res = await fetch(`${SB_URL_JURUSAN}?id_jurusan=eq.${encodeURIComponent(jurusanIdToDelete)}`, {
+                    method: 'DELETE',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                
+                if (res.ok) { 
+                    showToast("Jurusan berhasil dihapus!"); 
+                    fetchJurusanData(); 
+                } else {
+                    const err = await res.json();
+                    throw new Error(err.message || "Gagal menghapus data.");
+                }
+                document.getElementById('confirm-modal').style.display = 'none';
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; }
+        };
+
+        document.getElementById('form-jurusan').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            const fd = new FormData(e.target);
+            const data = Object.fromEntries(fd.entries());
+            data.kode_jurusan = data.kode_jurusan.toUpperCase();
+
+            try {
+                let res;
+                if (isEditMode) {
+                    res = await fetch(`${SB_URL_JURUSAN}?id_jurusan=eq.${encodeURIComponent(data.id_jurusan)}`, {
+                        method: 'PATCH',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify({ kode_jurusan: data.kode_jurusan, nama_jurusan: data.nama_jurusan })
+                    });
+                } else {
+                    res = await fetch(SB_URL_JURUSAN, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                if (res.ok) { 
+                    showToast(isEditMode ? "Data berhasil diperbarui!" : "Data berhasil disimpan!"); 
+                    modal.style.display = 'none'; 
+                    fetchJurusanData(); 
+                } else {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Gagal menyimpan ke database.");
+                }
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
+        };
+
+        // Theme & Canvas Logic
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark'); themeCheckbox.checked = true; }
+        themeCheckbox.addEventListener('change', () => {
+            const isDark = themeCheckbox.checked;
+            document.body.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 0.6 - 0.3; this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX *= -1; if (this.y > canvas.height || this.y < 0) this.speedY *= -1; }
+            draw(c) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const c = document.body.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(79,70,229,0.1)';
+            particles.forEach(p => { p.update(); p.draw(c); });
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', initCanvas); initCanvas();
+        for(let i=0; i<50; i++) particles.push(new Particle()); animate();
+
+        const role = new URLSearchParams(window.location.search).get('role') || 'User';
+        ['link-dashboard', 'link-siswa', 'link-guru', 'link-kelas', 'link-mapel', 'link-absensi', 'link-jurusan', 'link-laporan', 'link-pengaturan'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.href = el.getAttribute('href').split('?')[0] + `?role=${role}`;
+        });
+
+        fetchJurusanData();
+    </script>
+</body>
+</html>

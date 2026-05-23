@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISISWA - SMKN 1 Parittiga</title>
+    <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0,0,0,0.1);
+            --table-border: #e5e7eb;
+            --glass-blur: blur(10px);
+        }
+
+        body.dark {
+            --bg-color: #111827;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --modal-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --nav-bg: rgba(15, 23, 42, 0.6);
+            --nav-border: rgba(255,255,255,0.1);
+            --table-border: #374151;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        
+        nav {
+            background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo { height: 32px; width: auto; }
+        .nav-logo-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.2; }
+        .nav-system-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; margin-top: 4px; }
+        .nav-system-subtitle {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .wrapper { display: flex; flex-direction: column; min-height: calc(100vh - 73px); }
+        .main-sidebar {
+            width: 100%;
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--nav-border);
+            padding: 10px 0;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: var(--glass-blur);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .main-sidebar::-webkit-scrollbar { display: none; }
+
+        .nav-sidebar { list-style: none; display: flex; justify-content: center; flex-wrap: nowrap; gap: 5px; padding: 0 20px; }
+        .nav-item a { padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-color); text-decoration: none; font-size: 0.75rem; font-weight: 500; border-radius: 12px; transition: all 0.3s ease; white-space: nowrap; }
+        .nav-item i { font-size: 1.4rem; color: var(--primary-color); transition: transform 0.3s ease; }
+        .nav-item a:hover, .nav-item.active a { background: rgba(79, 70, 229, 0.1); transform: translateY(-2px); }
+        .nav-item a:hover i { transform: scale(1.1); }
+
+        .content { flex: 1; padding: 30px; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%);
+            color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
+            font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .btn-add:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
+        .btn-add:active { transform: scale(0.95); }
+
+        /* Modern Table Styles (not directly used here, but for consistency) */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--table-border);
+        }
+
+        table { width: 100%; border-collapse: collapse; background: transparent; }
+        th { 
+            background: rgba(79, 70, 229, 0.05);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.1);
+            white-space: nowrap;
+        }
+        td { 
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--table-border);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: rgba(79, 70, 229, 0.01); }
+        tr:hover { background-color: rgba(79, 70, 229, 0.04) !important; transition: all 0.2s ease; }
+
+        body.dark th { background: rgba(255, 255, 255, 0.03); border-bottom-color: rgba(255, 255, 255, 0.1); }
+        body.dark tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
+
+        .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; }
+        .btn-action:active { transform: scale(0.92); }
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background-color: #ef4444;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-logout:active { transform: scale(0.92); }
+        .btn-logout:hover { opacity: 0.8; }
+
+        /* Theme Toggle Slider in Nav */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 46px;
+        }
+
+        .theme-switch input { display: none; }
+
+        .slider-toggle {
+            background-color: var(--selector-bg, rgba(0,0,0,0.05));
+            border: 1px solid var(--nav-border);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            backdrop-filter: blur(5px);
+        }
+
+        .slider-toggle:before {
+            background-color: var(--white, #fff);
+            bottom: 3px;
+            content: "";
+            height: 16px;
+            left: 3px;
+            position: absolute;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 16px;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .slider-toggle {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(22px);
+            background-color: #f3f4f6;
+        }
+
+        .slider-toggle i { font-size: 9px; z-index: 1; }
+        .fa-sun { color: #f1c40f; }
+        .fa-moon { color: #6b7280; }
+        body.dark .fa-moon { color: #f3f4f6; }
+
+        /* Modal & Toast Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); outline: none; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border-left: 4px solid #10b981; transform: translateX(120%); transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: #ef4444; }
+
+        /* Password Toggle */
+        input::-ms-reveal, input::-ms-clear { display: none; }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 40px !important; }
+        .password-wrapper i {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer;
+            color: var(--text-muted); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); padding: 5px;
+        }
+        .password-wrapper i:hover { color: var(--primary-color); transform: translateY(-50%) scale(1.2); }
+        .password-wrapper i:active { transform: translateY(-50%) scale(0.9); }
+
+        /* Photo Preview Elegant Styles */
+        #photo-preview-modal {
+            background: rgba(0, 0, 0, 0.85);
+            transition: opacity 0.4s ease;
+        }
+        .photo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            transform: scale(0.6) translateY(50px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #photo-preview-modal.active .photo-wrapper {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .close-photo-btn {
+            width: 45px; height: 45px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .close-photo-btn:active { transform: scale(0.85); }
+        .close-photo-btn:hover { background: #ef4444; transform: rotate(90deg); border-color: #ef4444; }
+        #modal-photo-display {
+            max-width: 90vw; max-height: 80vh;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 5px solid rgba(255,255,255,0.9);
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .content { padding: 15px 15px 100px 15px; }
+            .main-sidebar {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92%;
+                max-width: 500px;
+                border-radius: 25px;
+                border: 1px solid var(--nav-border);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                padding: 8px 0;
+                margin: 0;
+                background: var(--nav-bg);
+            }
+            .nav-sidebar { justify-content: flex-start; padding: 0 15px; }
+            .nav-item a { padding: 8px 12px; font-size: 0.65rem; min-width: 70px; }
+            .nav-item i { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav>
+        <div style="display: flex; align-items: center;">
+            <a href="dashboard.html" class="nav-logo-link">
+                <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
+                <span class="nav-system-title">SISISWA</span>
+                <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+            </a>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </div>
+                </label>
+            </div>
+            <a href="index.html" class="btn-logout">Keluar</a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <aside class="main-sidebar">
+            <ul class="nav-sidebar">
+                <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item active"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Pengaturan Akun</h2>
+                </div>
+                <form id="form-pengaturan" style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                    <input type="hidden" id="id_guru" name="id_guru">
+                    <input type="hidden" id="current_photo_url" name="current_photo_url">
+
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; padding-bottom: 20px; border-bottom: 1px solid var(--nav-border);">
+                        <img id="profile-photo-preview" src="https://via.placeholder.com/150?text=No+Photo" alt="Foto Profil" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <input type="file" id="input-profile-foto" name="foto" accept="image/*" style="display: none;">
+                        <button type="button" id="btn-change-photo" class="btn-add" style="padding: 8px 15px; font-size: 0.8rem;"><i class="fas fa-camera"></i> Ubah Foto Profil</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" id="nama_guru" name="nama_guru" required>
+                        </div>
+                        <div class="form-group">
+                            <label>NIP</label>
+                            <input type="text" id="nip_guru" name="nip_guru" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <input type="text" id="alamat_guru" name="alamat_guru" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor HP</label>
+                            <input type="tel" id="no_hp_guru" name="no_hp_guru" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="username_guru" name="username_guru" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <input type="text" id="role" name="role" readonly>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary-color);">Ubah Kata Sandi</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Kata Sandi Baru</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="new_pass" name="new_pass" placeholder="••••••••">
+                                <i class="fas fa-eye" id="toggleNewPass"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Konfirmasi Kata Sandi Baru</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirm_new_pass" name="confirm_new_pass" placeholder="••••••••">
+                                <i class="fas fa-eye" id="toggleConfirmNewPass"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-add" style="width:100%; margin-top:20px; justify-content:center;">Simpan Perubahan</button>
+                </form>
+            </div>
+            <footer class="footer-content">
+                &copy; SISISWA - SMK Negeri 1 Parittiga
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modal Preview Foto (reused from data_guru) -->
+    <div class="modal-overlay" id="photo-preview-modal">
+        <div class="photo-wrapper">
+            <button id="close-photo-preview-btn" class="close-photo-btn">&times;</button>
+            <img id="modal-photo-display" src="" alt="Foto Profil">
+        </div>
+    </div>
+
+    <!-- Container Notifikasi -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // Canvas Animation Logic (reused)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+        
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.6 - 0.3;
+                this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw(color) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill();
+            }
+        }
+
+        function createParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.body.classList.contains('dark');
+            const color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(79, 70, 229, 0.1)';
+            
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw(color);
+                
+                for (let j = index; j < particles.length; j++) {
+                    const dx = p.x - particles[j].x;
+                    const dy = p.y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 200) {
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+
+                if (mouse.x != null && mouse.y != null) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 180) {
+                        ctx.strokeStyle = color;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        createParticles();
+        animate();
+
+        // Supabase Config (using tb_guru for user data)
+        const SB_URL_GURU = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_guru";
+        const SB_STORAGE = "https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/assets";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+
+        let currentPhotoUrl = ""; // To track current photo for replacement logic
+
+        // Global Notification Function (reused)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Photo Preview Logic (reused)
+        const photoPreviewModal = document.getElementById('photo-preview-modal');
+        const modalPhotoDisplay = document.getElementById('modal-photo-display');
+        const closePhotoPreviewBtn = document.getElementById('close-photo-preview-btn');
+
+        function showPhotoPreview(imageUrl) {
+            modalPhotoDisplay.src = imageUrl;
+            photoPreviewModal.style.display = 'flex';
+            setTimeout(() => photoPreviewModal.classList.add('active'), 10);
+        }
+
+        function closePhotoPreview() {
+            photoPreviewModal.classList.remove('active');
+            setTimeout(() => {
+                photoPreviewModal.style.display = 'none';
+                modalPhotoDisplay.src = '';
+            }, 400);
+        }
+
+        closePhotoPreviewBtn.onclick = closePhotoPreview;
+        photoPreviewModal.onclick = (e) => { 
+            if (e.target === photoPreviewModal) closePhotoPreview(); 
+        };
+
+        // --- Authentication Check ---
+        function checkAuth() {
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+            }
+        }
+        checkAuth();
+
+        // --- Fetch User Data for Settings ---
+        async function fetchUserData() {
+            const username = sessionStorage.getItem('username');
+            if (!username) {
+                showToast("Username tidak ditemukan di sesi. Silakan login ulang.", "error");
+                setTimeout(() => window.location.href = 'index.html', 1500);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${SB_URL_GURU}?username_guru=eq.${username}&select=*`, {
+                    method: 'GET',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Gagal mengambil data pengguna.");
+                }
+                const userData = await res.json();
+                if (userData.length === 0) {
+                    throw new Error("Data pengguna tidak ditemukan.");
+                }
+
+                const user = userData[0];
+                document.getElementById('id_guru').value = user.id_guru;
+                document.getElementById('nama_guru').value = user.nama_guru || '';
+                document.getElementById('nip_guru').value = user.nip_guru || '';
+                document.getElementById('alamat_guru').value = user.alamat_guru || '';
+                document.getElementById('no_hp_guru').value = user.no_hp_guru || '';
+                document.getElementById('username_guru').value = user.username_guru || '';
+                document.getElementById('role').value = user.role || '';
+                
+                currentPhotoUrl = user.foto || '';
+                if (currentPhotoUrl) {
+                    document.getElementById('profile-photo-preview').src = currentPhotoUrl;
+                } else {
+                    document.getElementById('profile-photo-preview').src = "https://via.placeholder.com/150?text=No+Photo";
+                }
+
+            } catch (err) {
+                showToast(err.message, "error");
+            }
+        }
+
+        // --- Handle Profile Photo Change ---
+        const profilePhotoPreview = document.getElementById('profile-photo-preview');
+        const inputProfileFoto = document.getElementById('input-profile-foto');
+        const btnChangePhoto = document.getElementById('btn-change-photo');
+
+        btnChangePhoto.onclick = () => inputProfileFoto.click();
+
+        inputProfileFoto.onchange = function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => { profilePhotoPreview.src = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        profilePhotoPreview.onclick = () => {
+            if (profilePhotoPreview.src && !profilePhotoPreview.src.includes('placeholder')) {
+                showPhotoPreview(profilePhotoPreview.src);
+            }
+        };
+
+        // --- Handle Form Submission (Update Profile & Password) ---
+        document.getElementById('form-pengaturan').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            const id_guru = document.getElementById('id_guru').value;
+            const nama_guru = document.getElementById('nama_guru').value;
+            const nip_guru = document.getElementById('nip_guru').value;
+            const alamat_guru = document.getElementById('alamat_guru').value;
+            const no_hp_guru = document.getElementById('no_hp_guru').value;
+            const new_pass = document.getElementById('new_pass').value;
+            const confirm_new_pass = document.getElementById('confirm_new_pass').value;
+            const inputFotoFile = document.getElementById('input-profile-foto').files[0];
+
+            let updateData = {
+                nama_guru: nama_guru,
+                nip_guru: nip_guru,
+                alamat_guru: alamat_guru,
+                no_hp_guru: no_hp_guru
+            };
+
+            try {
+                // Handle Photo Upload/Replacement
+                if (inputFotoFile) {
+                    // Delete old photo if exists
+                    if (currentPhotoUrl) {
+                        const oldFileName = currentPhotoUrl.split('/').pop();
+                        await fetch(`${SB_STORAGE}/${oldFileName}`, {
+                            method: 'DELETE',
+                            headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                        });
+                    }
+
+                    const fileName = `${Date.now()}_${inputFotoFile.name}`;
+                    const uploadRes = await fetch(`${SB_STORAGE}/${fileName}`, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': inputFotoFile.type },
+                        body: inputFotoFile
+                    });
+                    if (!uploadRes.ok) throw new Error("Gagal mengunggah foto.");
+                    updateData.foto = `https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/public/assets/${fileName}`;
+                } else {
+                    // If no new photo, retain current one
+                    updateData.foto = currentPhotoUrl;
+                }
+
+                // Handle Password Change
+                if (new_pass) {
+                    if (new_pass !== confirm_new_pass) {
+                        throw new Error("Kata sandi baru dan konfirmasi tidak cocok.");
+                    }
+                    // IMPORTANT: In a real app, hash the password on the backend (e.g., using Supabase Edge Functions or a custom API)
+                    // For this frontend-only example, we'll directly update the plain text password.
+                    // This is NOT secure for production.
+                    updateData.pass_guru = new_pass; 
+                    showToast("Peringatan: Password disimpan tanpa hashing. Ini tidak aman untuk produksi.", "error");
+                }
+
+                // Update user data in Supabase
+                const res = await fetch(`${SB_URL_GURU}?id_guru=eq.${id_guru}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || "Gagal menyimpan perubahan.");
+                }
+
+                showToast("Profil berhasil diperbarui!");
+                // Re-fetch data to ensure UI is updated with latest info (e.g., new photo URL)
+                fetchUserData();
+                // Clear password fields after successful update
+                document.getElementById('new_pass').value = '';
+                document.getElementById('confirm_new_pass').value = '';
+
+            } catch (err) {
+                showToast(err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan Perubahan";
+            }
+        };
+
+        // --- Password Toggle Logic ---
+        function setupPasswordToggle(toggleId, inputId) {
+            const toggleBtn = document.getElementById(toggleId);
+            const inputField = document.getElementById(inputId);
+            if (toggleBtn && inputField) {
+                toggleBtn.onclick = function() {
+                    const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    inputField.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                };
+            }
+        }
+        setupPasswordToggle('toggleNewPass', 'new_pass');
+        setupPasswordToggle('toggleConfirmNewPass', 'confirm_new_pass');
+
+
+        // --- Theme Toggle Logic (reused) ---
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark');
+            themeCheckbox.checked = true;
+        }
+
+        themeCheckbox.addEventListener('change', () => {
+            const isDark = themeCheckbox.checked;
+            body.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // --- Navigation Links Update (reused) ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = sessionStorage.getItem('role') || 'User'; // Get role from session
+        document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
+        document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
+        document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
+        document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
+        document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
+        document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
+        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
+
+        // --- Logout Button (reused) ---
+        const btnLogout = document.querySelector('.btn-logout');
+        if (btnLogout) {
+            btnLogout.onclick = (e) => {
+                e.preventDefault();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            };
+        }
+
+        // Initial data fetch
+        fetchUserData();
+    </script>
+</body>
+</html>

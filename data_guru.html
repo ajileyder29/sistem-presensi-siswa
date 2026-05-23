@@ -166,12 +166,84 @@
             transform: rotate(90deg);
         }
 
-        /* Table Responsiveness */
+        /* Search Wrapper Styles */
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 350px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--nav-border);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: var(--modal-bg);
+        }
+
+        /* Modern Table Styles */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            margin-top: 10px;
+            margin-top: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--table-border);
+        }
+
+        table { width: 100%; border-collapse: collapse; background: transparent; }
+        th { 
+            background: rgba(79, 70, 229, 0.05);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 2px solid rgba(79, 70, 229, 0.1);
+            white-space: nowrap;
+        }
+        td { 
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--table-border);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: rgba(79, 70, 229, 0.01); }
+        tr:hover { background-color: rgba(79, 70, 229, 0.04) !important; transition: all 0.2s ease; }
+
+        body.dark th { background: rgba(255, 255, 255, 0.03); border-bottom-color: rgba(255, 255, 255, 0.1); }
+        body.dark tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
+
+        .id-badge {
+            background: var(--selector-bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            border: 1px solid var(--nav-border);
         }
 
         /* Modal Styles */
@@ -243,12 +315,6 @@
             .nav-item a { padding: 8px 12px; font-size: 0.65rem; min-width: 70px; }
             .nav-item i { font-size: 1.2rem; }
         }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--table-border); }
-        th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap; }
-        tr:hover { background-color: rgba(79, 70, 229, 0.02); }
-        td { font-size: 0.9rem; }
         
         .action-cell {
             display: flex;
@@ -450,17 +516,24 @@
         <aside class="main-sidebar">
             <ul class="nav-sidebar">
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="#"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item active"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
-                <li class="nav-item"><a href="#"><i class="fas fa-file-invoice"></i> Laporan</a></li>
-                <li class="nav-item"><a href="#"><i class="fas fa-cog"></i> Pengaturan</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
             </ul>
         </aside>
         <main class="content">
             <div class="card">
                 <div class="card-header">
                     <h2>Daftar Data Guru</h2>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-guru" placeholder="Cari NIP atau Nama...">
+                    </div>
                     <button id="btn-tambah-guru" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Guru</button>
                 </div>
                 <div class="table-responsive">
@@ -500,8 +573,8 @@
             </div>
             <form id="form-guru">
                 <div class="form-grid">
-                    <div class="form-group"><label>ID Guru</label><input type="text" id="id_guru" name="id_guru" readonly required></div>
-                    <div class="form-group"><label>Nama Lengkap</label><input type="text" name="nama_guru" required></div>
+                    <input type="hidden" id="id_guru" name="id_guru">
+                    <div class="form-group-full"><label>Nama Lengkap</label><input type="text" name="nama_guru" required></div>
                     <div class="form-group"><label>NIP</label><input type="text" name="nip_guru" required></div>
                     <div class="form-group"><label>Tempat Lahir</label><input type="text" name="tempat_lahir" required></div>
                     <div class="form-group"><label>Tanggal Lahir</label><input type="date" name="tgl_lahir" required></div>
@@ -589,6 +662,8 @@
         const SB_STORAGE = "https://zmvnqixjxlyaigecgpgi.supabase.co/storage/v1/object/assets";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
 
+        let allTeachers = []; // Global state untuk menyimpan data asli
+
         // Helper function untuk format tanggal YYYY-MM-DD ke DD-MM-YYYY
         function formatDate(dateStr) {
             if (!dateStr || dateStr === '-') return '-';
@@ -601,7 +676,8 @@
             const tbody = document.getElementById('table-body-guru');
             tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Memuat data...</td></tr>';
             try {
-                const res = await fetch(`${SB_URL}?select=*`, {
+                // Tambahkan cache-buster (t=...) untuk memastikan data selalu segar
+                const res = await fetch(`${SB_URL}?select=*&order=created_at.desc.nullslast`, {
                     method: 'GET',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
@@ -609,17 +685,32 @@
                     const errorData = await res.json();
                     throw new Error(errorData.message || "Gagal mengambil data");
                 }
-                const teachers = await res.json();
-                tbody.innerHTML = '';
-                if (teachers.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Belum ada data guru.</td></tr>';
-                    return;
-                }
-                teachers.forEach((teacher, index) => {
-                    tbody.innerHTML += `
+                allTeachers = await res.json();
+                
+                // Fallback sort di sisi klien untuk memastikan urutan jika API telat memproses index
+                allTeachers.sort((a, b) => {
+                    const dateA = new Date(a.created_at || 0);
+                    const dateB = new Date(b.created_at || 0);
+                    return dateB - dateA;
+                });
+
+                applySearch(); // Panggil applySearch agar tampilan tetap sinkron dengan input pencarian
+            } catch (err) { tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">${err.message}</td></tr>`; }
+        }
+
+        // Fungsi rendering tabel terpisah agar bisa digunakan kembali oleh fitur search
+        function renderGuruTable(teachers) {
+            const tbody = document.getElementById('table-body-guru');
+            tbody.innerHTML = '';
+            if (teachers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                return;
+            }
+            teachers.forEach((teacher, index) => {
+                tbody.innerHTML += `
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${teacher.id_guru || '-'}</td>
+                            <td><span class="id-badge">${teacher.id_guru || '-'}</span></td>
                             <td>${teacher.nip_guru || '-'}</td>
                             <td>${teacher.nama_guru || '-'}</td>
                             <td>${teacher.alamat_guru || '-'}</td>
@@ -640,9 +731,20 @@
                                 </div>
                             </td>
                         </tr>`;
-                });
-            } catch (err) { tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">${err.message}</td></tr>`; }
+            });
         }
+
+        // Event listener untuk fitur search
+        function applySearch() {
+            const searchTerm = document.getElementById('search-guru').value.toLowerCase();
+            const filtered = allTeachers.filter(t => 
+                (t.nama_guru && t.nama_guru.toLowerCase().includes(searchTerm)) || 
+                (t.nip_guru && t.nip_guru.toLowerCase().includes(searchTerm))
+            );
+            renderGuruTable(filtered);
+        }
+        document.getElementById('search-guru').addEventListener('input', applySearch);
+
         fetchGuruData();
 
         // Modal & ID Gen Logic
@@ -684,7 +786,7 @@
             
             try {
                 // 1. Ambil info foto
-                const getRes = await fetch(`${SB_URL}?id_guru=eq.${teacherIdToDelete}&select=foto`, {
+                const getRes = await fetch(`${SB_URL}?id_guru=eq.${encodeURIComponent(teacherIdToDelete)}&select=foto`, {
                     method: 'GET',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
@@ -700,7 +802,7 @@
                 }
 
                 // 3. Hapus Row Database
-                const res = await fetch(`${SB_URL}?id_guru=eq.${teacherIdToDelete}`, {
+                const res = await fetch(`${SB_URL}?id_guru=eq.${encodeURIComponent(teacherIdToDelete)}`, {
                     method: 'DELETE',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
@@ -749,7 +851,7 @@
             document.getElementById('modal-title').innerText = "Edit Data Guru";
             
             try {
-                const res = await fetch(`${SB_URL}?id_guru=eq.${id}`, {
+                const res = await fetch(`${SB_URL}?id_guru=eq.${encodeURIComponent(id)}`, {
                     method: 'GET',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
@@ -785,6 +887,9 @@
             document.getElementById('form-guru').reset();
             previewFoto.style.display = 'none';
             currentPhotoUrl = "";
+            
+            document.getElementById('search-guru').value = ""; // Bersihkan kolom pencarian saat tambah guru
+            applySearch(); // Reset tampilan tabel agar data baru nantinya terlihat jelas di atas
             
             const n = new Date();
             const r = Math.floor(1000 + Math.random() * 9000);
@@ -841,9 +946,11 @@
 
                 let res;
                 if (isEditMode) {
-                    res = await fetch(`${SB_URL}?id_guru=eq.${data.id_guru}`, {
+                    const updateId = data.id_guru;
+                    delete data.id_guru; // Hapus ID dari body agar tidak konflik dengan filter URL
+                    res = await fetch(`${SB_URL}?id_guru=eq.${encodeURIComponent(updateId)}`, {
                         method: 'PATCH',
-                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
                         body: JSON.stringify(data)
                     });
                 } else {
@@ -857,6 +964,9 @@
                 if (res.ok) { 
                     showToast(isEditMode ? "Data berhasil diperbarui!" : "Data berhasil disimpan!"); 
                     modal.style.display = 'none';
+                    
+                    // PENTING: Reset input pencarian agar pengguna bisa melihat data yang baru saja ditambahkan di urutan pertama
+                    document.getElementById('search-guru').value = "";
                     fetchGuruData();
                 }
                 else {
@@ -880,8 +990,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         const role = urlParams.get('role') || 'User';
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
+        document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
         document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
+        document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
+        document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
+        document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
+        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
     </script>
 </body>
 </html>

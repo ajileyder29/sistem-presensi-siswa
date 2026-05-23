@@ -73,31 +73,203 @@
         th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; }
         .status-group { display: flex; gap: 10px; }
         .status-item { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; cursor: pointer; }
-        .btn-save { background-color: var(--primary-color); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; width: 100%; margin-top: 20px; font-weight: 600; }
+        
+        .btn-logout {
+            padding: 8px 16px;
+            background-color: #ef4444;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-logout:active { transform: scale(0.92); }
+        .btn-logout:hover { opacity: 0.8; }
+
+        .btn-save { 
+            background-color: var(--primary-color); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; width: 100%; margin-top: 20px; font-weight: 600; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-save:active { transform: scale(0.96); }
+
+        .main-sidebar {
+            width: 100%;
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--nav-border);
+            padding: 10px 0;
+            z-index: 10;
+            transition: all 0.3s ease;
+            backdrop-filter: var(--glass-blur);
+            overflow-x: auto;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .main-sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
+        .nav-sidebar {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 5px;
+            padding: 0 20px;
+        }
+
+        .nav-item a {
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-item a:hover, .nav-item.active a {
+            background: rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-item a:hover i {
+            transform: scale(1.1);
+        }
+
+        .nav-item i {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        /* Theme Toggle Slider in Nav */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 46px;
+        }
+
+        .theme-switch input { display: none; }
+
+        .slider-toggle {
+            background-color: var(--nav-border);
+            border: 1px solid var(--nav-border);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            backdrop-filter: blur(5px);
+        }
+
+        .slider-toggle:before {
+            background-color: #fff;
+            bottom: 3px;
+            content: "";
+            height: 16px;
+            left: 3px;
+            position: absolute;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 16px;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .slider-toggle {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(22px);
+            background-color: #f3f4f6;
+        }
+
+        .slider-toggle i { font-size: 9px; z-index: 1; }
+        .fa-sun { color: #f1c40f; }
+        .fa-moon { color: #6b7280; }
+        body.dark .fa-moon { color: #f3f4f6; }
+
         @media (max-width: 768px) {
-            .main-sidebar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; border-radius: 25px; border: 1px solid var(--nav-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
-            .content { padding-bottom: 100px; }
+            nav { padding: 15px 20px; }
+            .content { padding: 20px 15px 100px 15px; }
+            
+            .main-sidebar {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92%;
+                max-width: 500px;
+                border-radius: 25px;
+                border: 1px solid var(--nav-border);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                padding: 8px 0;
+                margin: 0;
+                background: var(--nav-bg);
+            }
+            .nav-sidebar { justify-content: flex-start; padding: 0 15px; }
+            .nav-item a { padding: 8px 12px; font-size: 0.65rem; min-width: 70px; }
+            .nav-item i { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
     <canvas id="bg-canvas"></canvas>
-    <nav style="padding: 15px 40px;">
-        <a href="dashboard.html" class="nav-logo-link">
-            <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
-            <span class="nav-system-title">SISISWA</span>
-            <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
-        </a>
-        <a href="index.html" style="color: #ef4444; text-decoration: none; font-size: 0.9rem;">Keluar</a>
+    <nav>
+        <div style="display: flex; align-items: center;">
+            <a href="dashboard.html" class="nav-logo-link">
+                <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
+                <span class="nav-system-title">SISISWA</span>
+                <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+            </a>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider-toggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </div>
+                </label>
+            </div>
+            <a href="index.html" class="btn-logout">Keluar</a>
+        </div>
     </nav>
     <div class="wrapper">
         <aside class="main-sidebar">
             <ul class="nav-sidebar">
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li class="nav-item"><a href="#"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
                 <li class="nav-item active"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
-                <li class="nav-item"><a href="#"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
             </ul>
         </aside>
         <main class="content">
@@ -212,12 +384,43 @@
         animate();
 
         // Tema & Role
-        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark');
+            if (themeCheckbox) themeCheckbox.checked = true;
+        }
+
+        if (themeCheckbox) {
+            themeCheckbox.addEventListener('change', () => {
+                if (themeCheckbox.checked) {
+                    body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        document.querySelector('.btn-logout').onclick = (e) => {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        };
+
         const urlParams = new URLSearchParams(window.location.search);
         const role = urlParams.get('role') || 'User';
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
+        document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
         document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
+        document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
+        document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
+        document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
+        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
 
         loadDaftarAbsensi();
     </script>
