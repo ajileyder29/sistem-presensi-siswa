@@ -171,8 +171,9 @@
             text-decoration: none;
             border-radius: 6px;
             font-size: 0.9rem;
-            transition: opacity 0.3s;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        .btn-logout:active { transform: scale(0.92); }
 
         .btn-logout:hover {
             opacity: 0.8;
@@ -518,6 +519,43 @@
         initCanvas();
         createParticles();
         animate();
+
+        // --- Security & Auto-Logout Logic ---
+        const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 Menit
+        let idleTimer;
+
+        function checkAuth() {
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(logout, IDLE_TIMEOUT);
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            alert("Sesi Anda telah berakhir karena tidak ada aktivitas.");
+            window.location.href = 'index.html';
+        }
+
+        // Jalankan proteksi
+        checkAuth();
+        
+        // Pantau aktivitas user
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+            document.addEventListener(evt, resetIdleTimer, true);
+        });
+        resetIdleTimer();
+
+        // Button logout manual
+        document.querySelector('.btn-logout').onclick = (e) => {
+            e.preventDefault();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        };
 
         // Theme Logic
         const themeCheckbox = document.getElementById('theme-checkbox');
