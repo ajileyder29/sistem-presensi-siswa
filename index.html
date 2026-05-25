@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SISISWA - SMKN 1 Parittiga</title>
@@ -589,40 +590,80 @@
             this.classList.toggle('fa-eye-slash');
         };
 
-        document.querySelector('form').addEventListener('submit', function(e) {
+        // Supabase Config (from other files)
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+        const BASE_URL_USER = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_user";
+
+        document.querySelector('form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Mengambil data dari form
-            const role = document.querySelector('input[name="role"]:checked').value;
-            const username = document.getElementById('username').value;
+            const selectedRoleType = document.querySelector('input[name="role"]:checked').value;
+            const username = document.getElementById('username').value.trim(); // Tambahkan trim
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
-            // Logika pengecekan akun sederhana
-            if (role === 'guru' && username === 'guru' && password === 'guru123') {
-                processLogin('Guru', username, rememberMe);
-            } 
-            else if (role === 'admin' && username === 'admin' && password === 'admin123') {
-                processLogin('Admin', username, rememberMe);
-            } 
-            else {
-                alert('Login Gagal! Username atau password salah.');
+            if (!username || !password) return alert("Harap isi username dan password.");
+
+            try {
+                const res = await fetch(`${BASE_URL_USER}?username=eq.${encodeURIComponent(username)}&select=id_user,password,role,id_referensi`, {
+                    method: 'GET',
+                    headers: { 
+                        'apikey': SB_KEY, 
+                        'Authorization': `Bearer ${SB_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    const errorBody = await res.text();
+                    console.error("Supabase API Error:", errorBody);
+                    throw new Error(`Error ${res.status}: Gagal terhubung ke database.`);
+                }
+
+                const userData = await res.json();
+
+                if (userData.length === 0) {
+                    alert('Login Gagal! Username atau password salah.');
+                    return;
+                }
+
+                const user = userData[0];
+
+                // Verifikasi password dan role
+                if (user.password === password && user.role.toLowerCase() === selectedRoleType) {
+                    sessionStorage.setItem('id_user', user.id_user);
+                    if (user.id_referensi) sessionStorage.setItem('id_guru', user.id_referensi);
+                    processLogin(user.role, username, rememberMe); 
+                } else {
+                    alert('Login Gagal! Username, password, atau role salah.');
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert(`Terjadi kesalahan saat login: ${error.message}`);
             }
         });
 
         function processLogin(role, username, remember) {
-            // Set Session
             sessionStorage.setItem('isLoggedIn', 'true');
             sessionStorage.setItem('role', role);
+            sessionStorage.setItem('username', username);
             sessionStorage.setItem('loginTime', Date.now());
-
             if (remember) {
                 localStorage.setItem('remembered_user', JSON.stringify({ username }));
             } else {
                 localStorage.removeItem('remembered_user');
             }
-
             window.location.href = `dashboard.html?role=${role}`;
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SISISWA PWA Registered!'))
+                    .catch(err => console.log('PWA Registration Failed: ', err));
+            });
         }
     </script>
 </body>
