@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Absensi Kelas - SISISWA</title>
+    <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Libraries for Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4f46e5; --bg-color: #f3f4f6; --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff; --text-color: #1f2937; --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7); --nav-border: rgba(0,0,0,0.1);
+            --table-border: #e5e7eb; --glass-blur: blur(10px);
+        }
+        body.dark {
+            --bg-color: #111827; --card-bg: rgba(15, 23, 42, 0.4); --modal-bg: #1f2937;
+            --text-color: #f3f4f6; --text-muted: #9ca3af; --nav-bg: rgba(15, 23, 42, 0.6);
+            --nav-border: rgba(255,255,255,0.1); --table-border: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        nav { background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 100; }
+        .nav-logo { height: 32px; width: auto; }
+        .nav-logo-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.2; }
+        .nav-system-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; margin-top: 4px; }
+        .nav-system-subtitle { font-size: 0.55rem; color: var(--text-muted); font-weight: 400; }
+        .wrapper { display: flex; flex-direction: column; min-height: calc(100vh - 73px); }
+        .main-sidebar { width: 100%; background-color: var(--nav-bg); border-bottom: 1px solid var(--nav-border); padding: 10px 0; backdrop-filter: var(--glass-blur); overflow-x: auto; scrollbar-width: none; z-index: 10; }
+        .nav-sidebar { list-style: none; display: flex; justify-content: center; gap: 5px; padding: 0 20px; }
+        .nav-item a { padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-color); text-decoration: none; font-size: 0.75rem; font-weight: 500; border-radius: 12px; transition: all 0.3s ease; white-space: nowrap; }
+        .nav-item i { font-size: 1.4rem; color: var(--primary-color); }
+        .nav-item.active a { background: rgba(79, 70, 229, 0.1); }
+        .content { flex: 1; padding: 30px; }
+        
+        .filter-card { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-group-report { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 150px; }
+        .form-group-report label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .select-report, .input-report { padding: 10px 15px; border-radius: 10px; border: 1px solid var(--nav-border); background: var(--modal-bg); color: var(--text-color); outline: none; font-size: 0.85rem; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-widget { background: var(--modal-bg); padding: 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--nav-border); }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        .stat-info h4 { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .stat-info span { font-size: 1.4rem; font-weight: 700; }
+
+        .report-table-card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .export-btns { display: flex; gap: 10px; }
+        .btn-export { padding: 8px 15px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .btn-pdf { background: #ef4444; color: white; }
+        .btn-excel { background: #10b981; color: white; }
+
+        .btn-logout { padding: 8px 16px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
+        .btn-logout:active { transform: scale(0.92); }
+        .btn-logout:hover { opacity: 0.8; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; font-size: 0.75rem; color: var(--primary-color); border-bottom: 2px solid var(--nav-border); text-transform: uppercase; }
+        td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid var(--nav-border); }
+        .low-attendance { color: #ef4444; font-weight: 700; }
+        .btn-warn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+        .btn-warn:hover { background: #ef4444; color: white; }
+
+        .footer-content { margin-top: 30px; text-align: center; font-size: 0.8rem; color: var(--text-muted); }
+        
+        /* Printing Styles */
+        @media print {
+            nav, .main-sidebar, .filter-card, .export-btns, .btn-warn, #bg-canvas { display: none !important; }
+            .wrapper, .content, .report-table-card { padding: 0 !important; background: white !important; color: black !important; }
+            .stat-widget { border: 1px solid #ccc !important; }
+        }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--modal-bg); width: 92%; max-width: 600px; border-radius: 20px; padding: 30px; animation: modalPop 0.3s ease; }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav>
+        <div style="display: flex; align-items: center;">
+            <a href="dashboard.html" class="nav-logo-link">
+                <img src="https://iili.io/C9pr3Ss.md.png" alt="Logo" class="nav-logo">
+                <span class="nav-system-title" id="nav-system-title">SISISWA</span>
+                <span class="nav-system-subtitle" id="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+            </a>
+        </div>
+        <a href="index.html" class="btn-logout">Keluar</a>
+    </nav>
+
+    <div class="wrapper">
+        <aside class="main-sidebar">
+            <ul class="nav-sidebar">
+                <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
+                <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item active"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="filter-card">
+                <div class="form-group-report">
+                    <label>Jurusan</label>
+                    <select id="filter-jurusan" class="select-report"><option value="">Semua Jurusan</option></select>
+                </div>
+                <div class="form-group-report">
+                    <label>Kelas</label>
+                    <select id="filter-kelas" class="select-report"><option value="">Pilih Kelas</option></select>
+                </div>
+                <div class="form-group-report">
+                    <label>Periode</label>
+                    <select id="filter-periode" class="select-report">
+                        <option value="today">Hari Ini</option>
+                        <option value="this_month">Bulan Ini</option>
+                        <option value="semester_1">Semester Ganjil</option>
+                        <option value="semester_2">Semester Genap</option>
+                    </select>
+                </div>
+                <button id="btn-fetch" class="btn-export" style="background: var(--primary-color); color: white; height: 40px; padding: 0 25px;">Tampilkan</button>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-widget">
+                    <div class="stat-icon" style="background: #4f46e5;"><i class="fas fa-user-graduate"></i></div>
+                    <div class="stat-info"><h4>Siswa Terdata</h4><span id="stat-total-siswa">0</span></div>
+                </div>
+                <div class="stat-widget">
+                    <div class="stat-icon" style="background: #10b981;"><i class="fas fa-percentage"></i></div>
+                    <div class="stat-info"><h4>Avg Kehadiran</h4><span id="stat-avg-present">0%</span></div>
+                </div>
+                <div class="stat-widget">
+                    <div class="stat-icon" style="background: #ef4444;"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="stat-info"><h4>Siswa Kritis</h4><span id="stat-total-critical">0</span></div>
+                </div>
+            </div>
+
+            <div class="report-table-card">
+                <div class="table-header">
+                    <h3>Rekapitulasi Kehadiran Siswa</h3>
+                    <div class="export-btns">
+                        <button onclick="exportToExcel()" class="btn-export btn-excel"><i class="fas fa-file-excel"></i> Excel</button>
+                        <button onclick="exportToPDF()" class="btn-export btn-pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="report-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIS</th>
+                                <th>Nama Siswa</th>
+                                <th>H</th>
+                                <th>S</th>
+                                <th>I</th>
+                                <th>A</th>
+                                <th>%</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">Gunakan filter untuk memuat data.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="footer-content">&copy; SISISWA - SMK Negeri 1 Parittiga</footer>
+        </main>
+    </div>
+
+    <!-- Modal Surat Peringatan -->
+    <div class="modal-overlay" id="warn-modal">
+        <div class="modal-content" id="print-area">
+            <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                <h2 style="font-size: 1.2rem;">SMK NEGERI 1 PARITTIGA</h2>
+                <p style="font-size: 0.8rem;">SURAT PERINGATAN KETIDAKHADIRAN (SP)</p>
+            </div>
+            <p style="font-size: 0.9rem; margin-bottom: 15px;">Diberitahukan kepada Orang Tua/Wali dari:</p>
+            <table style="width: 100%; margin-bottom: 20px; border: none;">
+                <tr><td style="width: 120px; border:none; padding: 5px 0;">Nama Siswa</td><td style="border:none;">: <strong id="warn-name">-</strong></td></tr>
+                <tr><td style="border:none; padding: 5px 0;">NIS / Kelas</td><td style="border:none;">: <span id="warn-nis">-</span> / <span id="warn-class">-</span></td></tr>
+                <tr><td style="border:none; padding: 5px 0;">Persentase</td><td style="border:none;">: <span id="warn-percent" style="color: red; font-weight: bold;">-</span></td></tr>
+            </table>
+            <p style="font-size: 0.85rem; line-height: 1.6;">Berdasarkan hasil rekapitulasi absensi elektronik SISISWA, putra/putri Bapak/Ibu memiliki tingkat kehadiran di bawah standar minimal (75%). Mohon untuk segera datang ke sekolah menemui Guru BK atau Wali Kelas.</p>
+            <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+                <div style="text-align: center; width: 200px;">
+                    <p style="font-size: 0.85rem;">Parittiga, <span id="current-date"></span></p>
+                    <p style="font-size: 0.85rem; margin-top: 60px;"><strong>( ............................ )</strong></p>
+                    <p style="font-size: 0.7rem;">Wali Kelas</p>
+                </div>
+            </div>
+            <div style="margin-top: 30px; display: flex; gap: 10px;" class="no-print">
+                <button onclick="window.print()" class="btn-export" style="background: #1f2937; color: white; flex: 1; justify-content: center;"><i class="fas fa-print"></i> Cetak Sekarang</button>
+                <button onclick="document.getElementById('warn-modal').style.display='none'" class="btn-export" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--nav-border);"><i class="fas fa-times"></i> Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+        const BASE_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1";
+        const headers = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` };
+
+        let reportData = [];
+        let currentClassName = "";
+
+        async function init() {
+            const [jurusans, kelas] = await Promise.all([
+                fetch(`${BASE_URL}/tb_jurusan?select=*&order=nama_jurusan`, { headers }).then(r => r.json()),
+                fetch(`${BASE_URL}/tb_kelas?select=*&order=nama_kelas`, { headers }).then(r => r.json())
+            ]);
+
+            const selJur = document.getElementById('filter-jurusan');
+            const selKel = document.getElementById('filter-kelas');
+            
+            jurusans.forEach(j => selJur.innerHTML += `<option value="${j.id_jurusan}">${j.nama_jurusan}</option>`);
+            
+            selJur.onchange = () => {
+                const val = selJur.value;
+                selKel.innerHTML = '<option value="">Pilih Kelas</option>';
+                const filtered = val ? kelas.filter(k => k.id_jurusan === val) : kelas;
+                filtered.forEach(k => selKel.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`);
+            };
+            selJur.onchange();
+
+            document.getElementById('btn-fetch').onclick = loadReport;
+        }
+
+        async function loadReport() {
+            const classId = document.getElementById('filter-kelas').value;
+            const periode = document.getElementById('filter-periode').value;
+            if (!classId) return alert("Pilih kelas terlebih dahulu");
+
+            currentClassName = document.getElementById('filter-kelas').options[document.getElementById('filter-kelas').selectedIndex].text;
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Memproses data...</td></tr>';
+
+            try {
+                let startDate, endDate;
+                const now = new Date();
+                if (periode === 'today') {
+                    startDate = endDate = now.toISOString().split('T')[0];
+                } else if (periode === 'this_month') {
+                    startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+                    endDate = now.toISOString().split('T')[0];
+                } else if (periode === 'semester_1') {
+                    startDate = `${now.getFullYear()}-07-01`; endDate = `${now.getFullYear()}-12-31`;
+                } else {
+                    startDate = `${now.getFullYear()}-01-01`; endDate = `${now.getFullYear()}-06-30`;
+                }
+
+                // 1. Ambil Siswa di Kelas tersebut
+                const siswa = await fetch(`${BASE_URL}/tb_siswa?id_kelas=eq.${classId}&order=nama_siswa`, { headers }).then(r => r.json());
+                
+                // 2. Ambil Absensi di rentang waktu tersebut
+                const absensi = await fetch(`${BASE_URL}/tb_absensi?id_siswa=in.(${siswa.map(s => s.id_siswa).join(',')})&tgl_absensi=gte.${startDate}&tgl_absensi=lte.${endDate}&select=id_siswa,status`, { headers }).then(r => r.json());
+
+                // 3. Kalkulasi
+                reportData = siswa.map(s => {
+                    const stats = { H: 0, S: 0, I: 0, A: 0 };
+                    absensi.filter(a => a.id_siswa === s.id_siswa).forEach(a => stats[a.status]++);
+                    
+                    const totalDays = stats.H + stats.S + stats.I + stats.A;
+                    const percent = totalDays === 0 ? 100 : Math.round((stats.H / totalDays) * 100);
+
+                    return { ...s, stats, percent };
+                });
+
+                renderTable();
+                updateWidgets();
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            reportData.forEach((row, idx) => {
+                const isCritical = row.percent < 75;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><code>${row.nis}</code></td>
+                        <td><strong>${row.nama_siswa}</strong></td>
+                        <td>${row.stats.H}</td>
+                        <td>${row.stats.S}</td>
+                        <td>${row.stats.I}</td>
+                        <td>${row.stats.A}</td>
+                        <td class="${isCritical ? 'low-attendance' : ''}">${row.percent}%</td>
+                        <td>
+                            ${isCritical ? `<button class="btn-warn" onclick="openWarnModal('${row.id_siswa}')">Cetak SP</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function updateWidgets() {
+            const totalSiswa = reportData.length;
+            const avgPresent = totalSiswa ? Math.round(reportData.reduce((acc, curr) => acc + curr.percent, 0) / totalSiswa) : 0;
+            const totalCritical = reportData.filter(r => r.percent < 75).length;
+
+            document.getElementById('stat-total-siswa').innerText = totalSiswa;
+            document.getElementById('stat-avg-present').innerText = avgPresent + '%';
+            document.getElementById('stat-total-critical').innerText = totalCritical;
+        }
+
+        function openWarnModal(id) {
+            const s = reportData.find(x => x.id_siswa === id);
+            document.getElementById('warn-name').innerText = s.nama_siswa;
+            document.getElementById('warn-nis').innerText = s.nis;
+            document.getElementById('warn-class').innerText = currentClassName;
+            document.getElementById('warn-percent').innerText = s.percent + '%';
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById('warn-modal').style.display = 'flex';
+        }
+
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(reportData.map(r => ({
+                NIS: r.nis, Nama: r.nama_siswa, Hadir: r.stats.H, Sakit: r.stats.S, Izin: r.stats.I, Alpha: r.stats.A, Persentase: r.percent + '%'
+            })));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absensi");
+            XLSX.writeFile(workbook, `Rekap_${currentClassName}.xlsx`);
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(`Rekapitulasi Absensi Kelas: ${currentClassName}`, 14, 15);
+            doc.autoTable({
+                html: '#report-table',
+                startY: 25,
+                columns: [
+                    {header: 'No', dataKey: 'no'}, {header: 'NIS', dataKey: 'nis'}, {header: 'Nama', dataKey: 'nama'},
+                    {header: 'H', dataKey: 'h'}, {header: 'S', dataKey: 's'}, {header: 'I', dataKey: 'i'}, {header: 'A', dataKey: 'a'}, {header: '%', dataKey: 'p'}
+                ],
+                body: reportData.map((r, i) => [i+1, r.nis, r.nama_siswa, r.stats.H, r.stats.S, r.stats.I, r.stats.A, r.percent + '%'])
+            });
+            doc.save(`Rekap_${currentClassName}.pdf`);
+        }
+
+        // --- Theme & Canvas ---
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Particle {
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 0.6 - 0.3; this.speedY = Math.random() * 0.6 - 0.3; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX *= -1; if (this.y > canvas.height || this.y < 0) this.speedY *= -1; }
+            draw() { ctx.fillStyle = 'rgba(79, 70, 229, 0.1)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', initCanvas); initCanvas();
+        for(let i=0; i<50; i++) particles.push(new Particle()); animate();
+
+        init();
+    </script>
+</body>
+</html>

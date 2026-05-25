@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Pelajaran - SISISWA</title>
+    <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0,0,0,0.1);
+            --table-border: #e5e7eb;
+            --glass-blur: blur(10px);
+        }
+        body.dark {
+            --bg-color: #111827;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --modal-bg: #1f2937;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --nav-bg: rgba(15, 23, 42, 0.6);
+            --nav-border: rgba(255,255,255,0.1);
+            --table-border: #374151;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        nav { background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 100; }
+        .nav-logo { height: 32px; width: auto; }
+        .nav-logo-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.2; }
+        .nav-system-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; margin-top: 4px; }
+        .nav-system-subtitle { font-size: 0.55rem; color: var(--text-muted); font-weight: 400; }
+        .wrapper { display: flex; flex-direction: column; min-height: calc(100vh - 73px); }
+        .main-sidebar { width: 100%; background-color: var(--nav-bg); border-bottom: 1px solid var(--nav-border); padding: 10px 0; z-index: 10; transition: all 0.3s ease; backdrop-filter: var(--glass-blur); overflow-x: auto; scrollbar-width: none; }
+        .nav-sidebar { list-style: none; display: flex; justify-content: center; flex-wrap: nowrap; gap: 5px; padding: 0 20px; }
+        .nav-item a { padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-color); text-decoration: none; font-size: 0.75rem; font-weight: 500; border-radius: 12px; transition: all 0.3s ease; white-space: nowrap; }
+        .nav-item i { font-size: 1.4rem; color: var(--primary-color); }
+        .nav-item a:hover, .nav-item.active a { background: rgba(79, 70, 229, 0.1); transform: translateY(-2px); }
+        .content { flex: 1; padding: 30px; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .btn-add { background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%); color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-add:hover { transform: translateY(-3px) scale(1.03); }
+        
+        .btn-add i, .btn-action i { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-add:hover i, .btn-action:hover i { transform: scale(1.1); }
+
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-group { display: flex; gap: 10px; flex: 1; min-width: 300px; }
+        .filter-group select { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--nav-border); background: var(--bg-color); color: var(--text-color); outline: none; }
+        .table-container { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--table-border); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(79, 70, 229, 0.05); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; padding: 15px 20px; text-align: left; }
+        td { padding: 15px 20px; border-bottom: 1px solid var(--table-border); font-size: 0.85rem; }
+        .session-badge { background: var(--primary-color); color: white; padding: 2px 8px; border-radius: 5px; font-weight: 600; font-size: 0.75rem; }
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: none;
+            font-size: 0.9rem;
+        }
+        .btn-action:active { transform: scale(0.92); }
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+        
+        .btn-logout { 
+            padding: 8px 16px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: inline-block;
+        }
+        .btn-logout:active { transform: scale(0.92); }
+        .btn-logout:hover { opacity: 0.8; }
+
+        .footer-content {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .confirm-content { 
+            text-align: center; max-width: 400px !important; 
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .icon-warning { font-size: 4rem; color: #ef4444; margin-bottom: 15px; }
+        .btn-cancel { 
+            background: var(--bg-color); color: var(--text-color);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--modal-bg); width: 95%; max-width: 520px; border-radius: 24px; padding: 40px; animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: 1px solid var(--nav-border); position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); }
+        .modal-content::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--primary-color), #6366f1); border-radius: 24px 24px 0 0; }
+        .modal-content h3 { color: var(--text-color); font-weight: 700; margin-bottom: 25px; font-size: 1.4rem; text-align: left; }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; border: 1.5px solid var(--nav-border); border-radius: 12px; background: var(--bg-color); color: var(--text-color); outline: none; transition: all 0.3s ease; font-size: 0.9rem; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); background: var(--modal-bg); }
+        .theme-switch-wrapper { display: flex; align-items: center; margin-right: 15px; }
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 46px; }
+        .theme-switch input { display: none; }
+        .slider-toggle { background-color: var(--selector-bg, rgba(0,0,0,0.05)); border: 1px solid var(--nav-border); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+        .slider-toggle:before { background-color: #fff; bottom: 3px; content: ""; height: 16px; left: 3px; position: absolute; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); width: 16px; border-radius: 50%; z-index: 2; }
+        input:checked + .slider-toggle { background-color: var(--primary-color); }
+        input:checked + .slider-toggle:before { transform: translateX(22px); }
+        .slider-toggle i { font-size: 9px; z-index: 1; }
+        .fa-sun { color: #f1c40f; }
+        .fa-moon { color: #6b7280; }
+        body.dark .fa-moon { color: #f3f4f6; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { 
+            background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; 
+            border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px; 
+            border-left: 4px solid var(--primary-color); transform: translateX(120%); transition: all 0.3s ease; 
+            backdrop-filter: blur(10px);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .content { padding: 20px 15px 100px 15px; }
+            .main-sidebar {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92%;
+                max-width: 500px;
+                border-radius: 25px;
+                border: 1px solid var(--nav-border);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                padding: 8px 0;
+                margin: 0;
+                background: var(--nav-bg);
+            }
+            .nav-sidebar { justify-content: flex-start; padding: 0 15px; }
+            .nav-item a { padding: 8px 12px; font-size: 0.65rem; min-width: 70px; }
+            .nav-item i { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <nav>
+        <div style="display: flex; align-items: center;">
+            <a href="dashboard.html" class="nav-logo-link">
+                <img src="https://iili.io/C9pr3Ss.md.png" alt="SekolahKu Logo" class="nav-logo">
+                <span class="nav-system-title">SISISWA</span>
+                <span class="nav-system-subtitle">(Sistem Absensi Siswa)</span>
+            </a>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-checkbox">
+                    <input type="checkbox" id="theme-checkbox" />
+                    <div class="slider-toggle"><i class="fas fa-moon"></i><i class="fas fa-sun"></i></div>
+                </label>
+            </div>
+            <a href="index.html" class="btn-logout">Keluar</a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <aside class="main-sidebar">
+            <ul class="nav-sidebar">
+                <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
+                <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item active"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
+                <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
+                <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
+                <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
+                <li class="nav-item"><a href="data_jurusan.html" id="link-jurusan"><i class="fas fa-graduation-cap"></i> Data Jurusan</a></li>
+                <li class="nav-item"><a href="#" id="link-laporan"><i class="fas fa-file-invoice"></i> Laporan</a></li>
+                <li class="nav-item"><a href="pengaturan.html" id="link-pengaturan"><i class="fas fa-cog"></i> Pengaturan</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="filter-group">
+                        <select id="filter-kelas"><option value="">Pilih Kelas...</option></select>
+                        <select id="filter-hari">
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                        </select>
+                    </div>
+                    <button id="btn-tambah-jadwal" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Jadwal</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jam Ke</th>
+                                <th>Waktu</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Guru Pengampu</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-jadwal">
+                            <tr><td colspan="5" style="text-align:center;">Silakan pilih kelas dan hari untuk melihat jadwal.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Tambah/Edit Jadwal -->
+    <div class="modal-overlay" id="modal-jadwal">
+        <div class="modal-content">
+            <h3 id="modal-title">Atur Jadwal Pelajaran</h3>
+            <form id="form-jadwal">
+                <input type="hidden" name="id_jadwal">
+                <div class="form-group">
+                    <label>Hari</label>
+                    <select name="hari" required>
+                        <option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option>
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label>Dari Jam Ke</label>
+                        <select name="sesi_ke" id="modal-sesi-mulai" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sampai Jam Ke</label>
+                        <select name="sesi_sampai" id="modal-sesi-selesai" required></select>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-group"><label>Jam Mulai</label><input type="time" name="jam_mulai" required></div>
+                    <div class="form-group"><label>Jam Selesai</label><input type="time" name="jam_selesai" required></div>
+                </div>
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <select name="id_kelas" id="modal-select-kelas" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Mata Pelajaran</label>
+                    <select name="id_mapel" id="modal-select-mapel" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Guru Pengampu</label>
+                    <select name="id_guru" id="modal-select-guru" required></select>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="button" class="btn-add" id="btn-close-modal" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
+                    <button type="submit" class="btn-add" style="flex:2; justify-content:center;">Simpan Jadwal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content confirm-content">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 style="margin-bottom: 10px;">Hapus Jadwal?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">
+                Data yang dihapus tidak dapat dipulihkan kembali. Tindakan ini bersifat permanen.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-action btn-cancel" id="cancel-delete" style="width: auto; padding: 10px 25px;">Batal</button>
+                <button class="btn-action btn-delete" id="confirm-delete-btn" style="width: auto; padding: 10px 25px;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+        const BASE_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1";
+
+        let isEditMode = false;
+        let jadwalIdToDelete = null;
+        const headers = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        async function fetchData(endpoint) {
+            const res = await fetch(`${BASE_URL}/${endpoint}`, { headers });
+            return await res.json();
+        }
+
+        async function initPage() {
+            // Load Dropdown Jam 1-11
+            const sMulai = document.getElementById('modal-sesi-mulai');
+            const sSelesai = document.getElementById('modal-sesi-selesai');
+            for(let i=1; i<=11; i++) {
+                const opt = `<option value="${i}">${i}</option>`;
+                sMulai.innerHTML += opt;
+                sSelesai.innerHTML += opt;
+            }
+
+            // Load References
+            const [kelas, mapel, guru] = await Promise.all([
+                fetchData('tb_kelas?select=id_kelas,nama_kelas&order=nama_kelas'),
+                fetchData('tb_mapel?select=id_mapel,nama_mapel&order=nama_mapel'),
+                fetchData('tb_guru?select=id_guru,nama_guru&order=nama_guru')
+            ]);
+
+            const fKelas = document.getElementById('filter-kelas');
+            const mKelas = document.getElementById('modal-select-kelas');
+            const mMapel = document.getElementById('modal-select-mapel');
+            const mGuru = document.getElementById('modal-select-guru');
+
+            kelas.forEach(k => {
+                const opt = `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
+                fKelas.innerHTML += opt; mKelas.innerHTML += opt;
+            });
+            mapel.forEach(m => mMapel.innerHTML += `<option value="${m.id_mapel}">${m.nama_mapel}</option>`);
+            guru.forEach(g => mGuru.innerHTML += `<option value="${g.id_guru}">${g.nama_guru}</option>`);
+
+            fKelas.onchange = fetchJadwal;
+            document.getElementById('filter-hari').onchange = fetchJadwal;
+        }
+
+        async function fetchJadwal() {
+            const kelasId = document.getElementById('filter-kelas').value;
+            const hari = document.getElementById('filter-hari').value;
+            const tbody = document.getElementById('table-body-jadwal');
+
+            if(!kelasId) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Pilih kelas terlebih dahulu.</td></tr>'; return; }
+            
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat Jadwal...</td></tr>';
+            
+            try {
+                const data = await fetchData(`tb_jadwal?id_kelas=eq.${kelasId}&hari=eq.${hari}&select=*,tb_mapel(nama_mapel),tb_guru(nama_guru)&order=sesi_ke.asc`);
+                tbody.innerHTML = '';
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada jadwal untuk hari ini.</td></tr>';
+                    return;
+                }
+
+                data.forEach(j => {
+                    const labelJam = j.sesi_sampai && j.sesi_sampai != j.sesi_ke 
+                        ? `${j.sesi_ke} - ${j.sesi_sampai}` 
+                        : j.sesi_ke;
+                    const startTime = j.jam_mulai ? j.jam_mulai.substring(0, 5) : '--:--';
+                    const endTime = j.jam_selesai ? j.jam_selesai.substring(0, 5) : '--:--';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="session-badge">Jam ke-${labelJam}</span></td>
+                            <td>${startTime} - ${endTime}</td>
+                            <td><strong>${j.tb_mapel?.nama_mapel || '-'}</strong></td>
+                            <td>${j.tb_guru?.nama_guru || '-'}</td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-action btn-edit" onclick="editJadwal('${j.id_jadwal}')" title="Edit Data">
+                                        <i class="fas fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteJadwal('${j.id_jadwal}')" title="Hapus Data">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        // CRUD Logic
+        const modal = document.getElementById('modal-jadwal');
+        document.getElementById('btn-tambah-jadwal').onclick = () => {
+            isEditMode = false;
+            document.getElementById('modal-title').innerText = "Tambah Jadwal Pelajaran";
+            document.getElementById('form-jadwal').reset();
+            document.querySelector('input[name="id_jadwal"]').value = `JDL.${Date.now()}`;
+
+            modal.style.display = 'flex';
+        };
+
+        document.getElementById('btn-close-modal').onclick = () => modal.style.display = 'none';
+
+        async function editJadwal(id) {
+            isEditMode = true;
+            document.getElementById('modal-title').innerText = "Edit Jadwal Pelajaran";
+            
+            const data = await fetchData(`tb_jadwal?id_jadwal=eq.${id}&select=*`);
+            if(data.length > 0) {
+                const j = data[0];
+                const f = document.getElementById('form-jadwal');
+                f.id_jadwal.value = j.id_jadwal;
+                f.hari.value = j.hari;
+                f.sesi_ke.value = j.sesi_ke;
+                f.sesi_sampai.value = j.sesi_sampai || j.sesi_ke;
+
+                f.jam_mulai.value = j.jam_mulai ? j.jam_mulai.substring(0, 5) : '';
+                f.jam_selesai.value = j.jam_selesai ? j.jam_selesai.substring(0, 5) : '';
+                f.id_kelas.value = j.id_kelas;
+                f.id_mapel.value = j.id_mapel;
+                f.id_guru.value = j.id_guru;
+                modal.style.display = 'flex';
+            }
+        }
+
+        const confirmModal = document.getElementById('confirm-modal');
+
+        function deleteJadwal(id) {
+            jadwalIdToDelete = id;
+            confirmModal.style.display = 'flex';
+        }
+
+        document.getElementById('cancel-delete').onclick = () => confirmModal.style.display = 'none';
+        confirmModal.onclick = (e) => { if (e.target === confirmModal) confirmModal.style.display = 'none'; };
+
+        document.getElementById('confirm-delete-btn').onclick = async () => {
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const res = await fetch(`${BASE_URL}/tb_jadwal?id_jadwal=eq.${encodeURIComponent(jadwalIdToDelete)}`, {
+                    method: 'DELETE', headers
+                });
+                if (res.ok) { showToast("Jadwal berhasil dihapus!"); fetchJadwal(); }
+                else throw new Error("Gagal menghapus data.");
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; confirmModal.style.display = 'none'; jadwalIdToDelete = null; }
+        };
+
+        document.getElementById('form-jadwal').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = "Memproses...";
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const sMulai = parseInt(data.sesi_ke);
+            const sSelesai = parseInt(data.sesi_sampai);
+
+            if (sSelesai < sMulai) {
+                showToast("Jam selesai tidak boleh lebih kecil dari jam mulai.", "error");
+                btn.disabled = false; btn.innerText = "Simpan Jadwal"; return;
+            }
+
+            try {
+                // --- Validasi Bentrok Jadwal ---
+                // Cek irisan rentang: (StartA <= EndB) AND (EndA >= StartB)
+                let checkUrl = `tb_jadwal?hari=eq.${data.hari}&sesi_ke=lte.${sSelesai}&sesi_sampai=gte.${sMulai}&or=(id_kelas.eq.${data.id_kelas},id_guru.eq.${data.id_guru})`;
+                if (isEditMode) checkUrl += `&id_jadwal=neq.${data.id_jadwal}`;
+                
+                const conflicts = await fetchData(checkUrl + "&select=id_jadwal");
+                if (conflicts.length > 0) throw new Error(`Bentrok! Rentang jam tersebut sudah terisi.`);
+
+                const payload = {
+                    hari: data.hari,
+                    sesi_ke: sMulai,
+                    sesi_sampai: sSelesai,
+                    jam_mulai: data.jam_mulai,
+                    jam_selesai: data.jam_selesai,
+                    id_kelas: data.id_kelas,
+                    id_mapel: data.id_mapel,
+                    id_guru: data.id_guru,
+                    id_jadwal: data.id_jadwal
+                };
+
+                let res;
+                if (isEditMode) {
+                    res = await fetch(`${BASE_URL}/tb_jadwal?id_jadwal=eq.${encodeURIComponent(data.id_jadwal)}`, {
+                        method: 'PATCH', headers, body: JSON.stringify(payload)
+                    });
+                } else {
+                    res = await fetch(`${BASE_URL}/tb_jadwal`, {
+                        method: 'POST', headers, body: JSON.stringify(payload)
+                    });
+                }
+
+                if (res.ok) { 
+                    showToast(isEditMode ? "Data berhasil diperbarui!" : "Data berhasil disimpan!"); 
+                    modal.style.display = 'none';
+                    fetchJadwal();
+                } else {
+                    const err = await res.json();
+                    // Log detail error ke console agar Anda bisa melihat pesan teknis dari Supabase
+                    console.error("Supabase Error Details:", err);
+                    throw new Error(err.message || err.hint || "Gagal menyimpan.");
+                }
+            } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Simpan Jadwal"; }
+        };
+
+        // UI Helpers
+        const themeCheckbox = document.getElementById('theme-checkbox');
+        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark'); themeCheckbox.checked = true; }
+        themeCheckbox.addEventListener('change', () => {
+            const isDark = themeCheckbox.checked;
+            document.body.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // --- Navigation Links Update ---
+        const role = sessionStorage.getItem('role') || 'User';
+        document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
+        document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
+        document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-jadwal').href = `data_jadwal.html?role=${role}`;
+        document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
+        document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
+        document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
+        document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
+        document.getElementById('link-laporan').href = `laporan_siswa.html?role=${role}`;
+        document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
+
+        // --- Logout Button ---
+        const btnLogout = document.querySelector('.btn-logout');
+        if (btnLogout) {
+            btnLogout.onclick = (e) => {
+                e.preventDefault();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            };
+        }
+
+        initPage();
+
+        // Background Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 0.6 - 0.3; this.speedY = Math.random() * 0.6 - 0.3;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = document.body.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.1)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        for(let i=0; i<50; i++) particles.push(new Particle());
+        animate();
+    </script>
+</body>
+</html>

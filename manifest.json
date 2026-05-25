@@ -1,0 +1,17 @@
+{
+  "name": "SISISWA - SMK Negeri 1 Parittiga",
+  "short_name": "SISISWA",
+  "description": "Sistem Absensi Siswa SMKN 1 Parittiga",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "https://iili.io/C9pr3Ss.md.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
