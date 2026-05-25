@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #4f46e5;
@@ -31,6 +32,11 @@
             --nav-border: rgba(255,255,255,0.1);
             --table-border: #374151;
         }
+
+        /* Form Grid Layout */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group-full { grid-column: span 2; }
+        .form-group label, .form-group-full label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
@@ -82,6 +88,9 @@
         }
         .btn-add:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
         .btn-add:active { transform: scale(0.95); }
+        
+        .btn-add i, .btn-action i, .pagination-btn i { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-add:hover i, .btn-action:hover i, .pagination-btn:hover i { transform: scale(1.1); }
 
         /* Modern Table Styles */
         .table-container {
@@ -120,10 +129,92 @@
         body.dark th { background: rgba(255, 255, 255, 0.03); border-bottom-color: rgba(255, 255, 255, 0.1); }
         body.dark tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
 
+        /* Search Wrapper Styles */
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 350px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--nav-border);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: var(--modal-bg);
+        }
+
         .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; }
         .btn-action:active { transform: scale(0.92); }
         .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
         .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+
+        .id-badge {
+            background: var(--selector-bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            border: 1px solid var(--nav-border);
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .pagination-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--nav-border);
+            background: var(--modal-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .pagination-btn:hover:not(:disabled) { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .confirm-content { 
+            text-align: center; max-width: 400px !important; 
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .icon-warning { font-size: 4rem; color: #ef4444; margin-bottom: 15px; }
+        .btn-cancel { 
+            background: var(--bg-color); color: var(--text-color);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-cancel:active { transform: scale(0.96); }
 
         .btn-logout {
             padding: 8px 16px;
@@ -202,7 +293,10 @@
 
         /* Modal & Toast Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+        .modal-content { 
+            background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); 
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); outline: none; }
@@ -265,6 +359,7 @@
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item active"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -278,7 +373,17 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Daftar Data Siswa</h2>
-                    <button id="btn-tambah-siswa" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Siswa</button>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-siswa" placeholder="Cari NIS, Nama, atau Jurusan...">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-import-siswa" class="btn-add" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="fas fa-file-import"></i> Import Excel
+                        </button>
+                        <button id="btn-tambah-siswa" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Siswa</button>
+                    </div>
+                    <input type="file" id="input-import-siswa" accept=".xlsx, .xls, .csv" style="display: none;">
                 </div>
                 <div class="table-container">
                     <table>
@@ -299,6 +404,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="pagination-container" class="pagination-container"></div>
             </div>
         </main>
     </div>
@@ -309,7 +415,7 @@
             <h3 id="modal-title" style="margin-bottom: 20px;">Tambah Data Siswa</h3>
             <form id="form-siswa">
                 <input type="hidden" name="id_siswa">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label>NIS</label>
                         <input type="text" name="nis" placeholder="Contoh: 222310101" required>
@@ -318,36 +424,37 @@
                         <label>NISN</label>
                         <input type="text" name="nisn_siswa" placeholder="Contoh: 0012345678" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="nama_siswa" required>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" name="nama_siswa" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <select name="jenis_kelamin" required>
+                            <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>Jurusan</label>
-                        <select name="jurusan" required>
-                            <option value="TKJ">TKJ</option>
-                            <option value="DKV">DKV</option>
-                            <option value="TSM">TSM</option>
-                            <option value="TITL">TITL</option>
+                        <select name="id_jurusan" required>
+                            <!-- Memuat dinamis -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Tingkat & Kelas</label>
-                        <select name="kelas" required>
-                            <option value="X">X (Sepuluh)</option>
-                            <option value="XI">XI (Sebelas)</option>
-                            <option value="XII">XII (Dua Belas)</option>
+                        <label>Kelas</label>
+                        <select name="id_kelas" required>
+                            <!-- Memuat dinamis -->
                         </select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Status Aktif</label>
-                    <select name="status_aktif">
-                        <option value="true">Aktif</option>
-                        <option value="false">Non-Aktif</option>
-                    </select>
+                    <div class="form-group">
+                        <label>Status Aktif</label>
+                        <select name="status_aktif">
+                            <option value="true">Aktif</option>
+                            <option value="false">Non-Aktif</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="button" class="btn-add" id="btn-close-modal" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
@@ -359,14 +466,42 @@
 
     <!-- Modal Konfirmasi Hapus -->
     <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-content" style="text-align: center; max-width: 400px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
-            <h3>Hapus Data Siswa?</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 20px;">Tindakan ini tidak dapat dibatalkan.</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-add" id="cancel-delete" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
-                <button class="btn-add" id="confirm-delete-btn" style="background:#ef4444; flex:1; justify-content:center;">Ya, Hapus</button>
+        <div class="modal-content confirm-content">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 style="margin-bottom: 10px;">Hapus Data Siswa?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">
+                Data yang dihapus tidak dapat dipulihkan kembali. Tindakan ini bersifat permanen.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-action btn-cancel" id="cancel-delete" style="width: auto; padding: 10px 25px;">Batal</button>
+                <button class="btn-action btn-delete" id="confirm-delete-btn" style="width: auto; padding: 10px 25px;">Ya, Hapus</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Import Siswa -->
+    <div class="modal-overlay" id="modal-import">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <h3 style="margin-bottom: 15px;">Import Data Siswa</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                Pastikan format data Anda sesuai dengan template yang telah disediakan agar proses import berjalan lancar.
+            </p>
+            
+            <div style="background: var(--selector-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px dashed var(--nav-border);">
+                <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; color: var(--primary-color);">Langkah 1: Unduh Format</p>
+                <button id="btn-download-template-modal" class="btn-add" style="background: rgba(79, 70, 229, 0.1); color: var(--primary-color); border: 1px solid rgba(79, 70, 229, 0.2); box-shadow: none; width: 100%; justify-content: center;">
+                    <i class="fas fa-download"></i> Unduh Template Excel
+                </button>
+            </div>
+
+            <div style="background: var(--selector-bg); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px dashed var(--nav-border);">
+                <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; color: #10b981;">Langkah 2: Unggah Data</p>
+                <button id="btn-trigger-upload" class="btn-add" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 100%; justify-content: center;">
+                    <i class="fas fa-upload"></i> Pilih File & Import
+                </button>
+            </div>
+
+            <button type="button" id="btn-close-import" style="background:none; border:none; color: var(--text-muted); cursor:pointer; font-size: 0.85rem; padding: 5px;">Tutup</button>
         </div>
     </div>
 
@@ -374,59 +509,343 @@
 
     <script>
         // Config Supabase
-        const SB_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_siswa";
+        const SB_URL_SISWA = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_siswa";
+        const SB_URL_JURUSAN = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_jurusan";
+        const SB_URL_KELAS = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_kelas";
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
 
         let isEditMode = false;
         let studentIdToDelete = null;
+        let allStudents = [];
+        let allKelasData = []; // State global untuk menyimpan data kelas agar bisa difilter
+        let allJurusanData = []; // State global untuk mapping saat import
+        let filteredStudents = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i> <span>${message}</span>`;
+            toast.className = `toast ${type === 'error' ? 'error' : 'success'}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
+
+        // --- Load Dropdown Data untuk Modal ---
+        async function fetchDropdownData() {
+            try {
+                const [resJur, resKel] = await Promise.all([
+                    fetch(`${SB_URL_JURUSAN}?select=id_jurusan,nama_jurusan&order=nama_jurusan.asc`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } }),
+                    fetch(`${SB_URL_KELAS}?select=id_kelas,nama_kelas,id_jurusan&order=nama_kelas.asc`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } })
+                ]);
+
+                if (!resJur.ok || !resKel.ok) throw new Error("Gagal mengambil data referensi");
+
+                const jurusan = await resJur.json();
+                allJurusanData = jurusan;
+                allKelasData = await resKel.json();
+
+                const selJur = document.querySelector('select[name="id_jurusan"]');
+                if (selJur && Array.isArray(jurusan)) {
+                    selJur.innerHTML = '<option value="" disabled selected>Pilih Jurusan</option>';
+                    jurusan.forEach(j => selJur.innerHTML += `<option value="${j.id_jurusan}">${j.nama_jurusan}</option>`);
+                }
+
+                // Inisialisasi awal dropdown kelas kosong
+                updateKelasDropdown("");
+            } catch (err) { console.error("Gagal memuat dropdown:", err); }
+        }
+
+        // Fungsi untuk memfilter dropdown kelas berdasarkan jurusan
+        function updateKelasDropdown(idJurusan, selectedValue = "") {
+            const selKel = document.querySelector('select[name="id_kelas"]');
+            selKel.innerHTML = '<option value="" disabled selected>Pilih Kelas (Pilih Jurusan Terlebih Dahulu)</option>';
+            
+            if (!idJurusan) return;
+
+            const filtered = allKelasData.filter(k => k.id_jurusan === idJurusan);
+            filtered.forEach(k => {
+                const selected = k.id_kelas === selectedValue ? 'selected' : '';
+                selKel.innerHTML += `<option value="${k.id_kelas}" ${selected}>${k.nama_kelas}</option>`;
+            });
+        }
+
+        // Listener saat user mengubah jurusan di modal
+        document.querySelector('select[name="id_jurusan"]').addEventListener('change', (e) => {
+            updateKelasDropdown(e.target.value);
+        });
 
         async function fetchSiswaData() {
             const tbody = document.getElementById('table-body-siswa');
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Memuat data...</td></tr>';
             try {
-                const res = await fetch(`${SB_URL}?select=*&order=nama_siswa.asc`, {
+                // Gunakan !id_jurusan dan !id_kelas untuk menghindari ambiguitas (PGRST201)
+                const res = await fetch(`${SB_URL_SISWA}?select=*,tb_jurusan!id_jurusan(nama_jurusan),tb_kelas!id_kelas(nama_kelas)&order=created_at.desc.nullslast`, {
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
-                const students = await res.json();
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Gagal mengambil data.");
+                
+                allStudents = Array.isArray(data) ? data : [];
+                
+                applySearch();
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function renderSiswaTable(students, startIndex = 0) {
+            const tbody = document.getElementById('table-body-siswa');
                 tbody.innerHTML = '';
-                if (students.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada data siswa.</td></tr>'; return; }
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                document.getElementById('pagination-container').innerHTML = '';
+                return;
+            }
                 
                 students.forEach((s, idx) => {
+                    // Ambil nama dari hasil JOIN (handle format object atau array)
+                    const namaJurusan = s.tb_jurusan ? (Array.isArray(s.tb_jurusan) ? (s.tb_jurusan[0]?.nama_jurusan || '-') : (s.tb_jurusan.nama_jurusan || '-')) : '-';
+                    const namaKelas = s.tb_kelas ? (Array.isArray(s.tb_kelas) ? (s.tb_kelas[0]?.nama_kelas || '-') : (s.tb_kelas.nama_kelas || '-')) : '-';
+
                     tbody.innerHTML += `
                         <tr>
-                            <td>${idx + 1}</td>
+                            <td>${startIndex + idx + 1}</td>
                             <td><strong>${s.nis}</strong></td>
                             <td><span style="color:var(--text-muted); font-family:monospace;">${s.nisn_siswa || '-'}</span></td>
                             <td>${s.nama_siswa}</td>
-                            <td><span style="background:rgba(79,70,229,0.1); color:var(--primary-color); padding:2px 8px; border-radius:4px; font-size:0.75rem;">${s.jurusan || '-'}</span></td>
-                            <td>${s.kelas || '-'}</td>
+                            <td><span style="background:rgba(79,70,229,0.1); color:var(--primary-color); padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600;">${namaJurusan}</span></td>
+                            <td>${namaKelas}</td>
                             <td><i class="fas fa-circle" style="color:${s.status_aktif ? '#10b981' : '#ef4444'}; font-size:0.6rem;"></i> ${s.status_aktif ? 'Aktif' : 'Non-Aktif'}</td>
                             <td>
                                 <div style="display:flex; gap:8px;">
-                                    <button class="btn-action btn-edit" onclick="editSiswa('${s.id_siswa}')"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-action btn-delete" onclick="triggerDelete('${s.id_siswa}')"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-action btn-edit" onclick="editSiswa('${s.id_siswa}')" title="Edit Data"><i class="fas fa-pen-to-square"></i></button>
+                                    <button class="btn-action btn-delete" onclick="deleteSiswa('${s.id_siswa}')" title="Hapus Data"><i class="fas fa-trash-can"></i></button>
                                 </div>
                             </td>
                         </tr>`;
                 });
-            } catch (err) { showToast(err.message, 'error'); }
         }
+
+        function displayTableAndPagination() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = filteredStudents.slice(start, end);
+            renderSiswaTable(paginatedItems, start);
+            renderPagination(filteredStudents.length);
+        }
+
+        function renderPagination(totalItems) {
+            const container = document.getElementById('pagination-container');
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => { currentPage--; displayTableAndPagination(); };
+            container.appendChild(prevBtn);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerText = i;
+                pageBtn.onclick = () => { currentPage = i; displayTableAndPagination(); };
+                container.appendChild(pageBtn);
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => { currentPage++; displayTableAndPagination(); };
+            container.appendChild(nextBtn);
+        }
+
+        function applySearch() {
+            const searchTerm = document.getElementById('search-siswa').value.toLowerCase();
+            filteredStudents = allStudents.filter(s => {
+                const namaSiswa = (s.nama_siswa || "").toLowerCase();
+                const nis = (s.nis || "").toLowerCase();
+                // Pencarian juga mencakup nama jurusan dan kelas dari hasil JOIN
+                const jur = s.tb_jurusan ? (Array.isArray(s.tb_jurusan) ? (s.tb_jurusan[0]?.nama_jurusan || "") : (s.tb_jurusan.nama_jurusan || "")) : "";
+                const kel = s.tb_kelas ? (Array.isArray(s.tb_kelas) ? (s.tb_kelas[0]?.nama_kelas || "") : (s.tb_kelas.nama_kelas || "")) : "";
+                
+                return namaSiswa.includes(searchTerm) || 
+                       nis.includes(searchTerm) || 
+                       jur.toLowerCase().includes(searchTerm) || 
+                       kel.toLowerCase().includes(searchTerm);
+            });
+            currentPage = 1;
+            displayTableAndPagination();
+        }
+        document.getElementById('search-siswa').addEventListener('input', applySearch);
+
+        // --- Bulk Import Logic ---
+        const modalImport = document.getElementById('modal-import');
+        
+        // Membuka modal import
+        document.getElementById('btn-import-siswa').onclick = () => {
+            modalImport.style.display = 'flex';
+            fetchDropdownData(); // Pastikan data referensi dimuat saat modal import dibuka
+        };
+
+        // Menutup modal import
+        document.getElementById('btn-close-import').onclick = () => modalImport.style.display = 'none';
+        modalImport.onclick = (e) => { if (e.target === modalImport) modalImport.style.display = 'none'; };
+
+        // Fungsi download template di dalam modal
+        document.getElementById('btn-download-template-modal').onclick = () => {
+            const templateData = [
+                {
+                    nis: "222310001",
+                    nisn_siswa: "0012345678",
+                    nama_siswa: "Zulva Rahman",
+                    jenis_kelamin: "L",
+                    id_jurusan: "LIHAT_DATA_JURUSAN",
+                    id_kelas: "LIHAT_DATA_KELAS",
+                    status_aktif: "TRUE"
+                }
+            ];
+
+            const worksheet = XLSX.utils.json_to_sheet(templateData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template Import Siswa");
+            
+            // Download file
+            XLSX.writeFile(workbook, "template_import_siswa.xlsx");
+            showToast("Template berhasil diunduh!");
+        };
+
+        // Memicu input file dari dalam modal
+        document.getElementById('btn-trigger-upload').onclick = () => {
+            document.getElementById('input-import-siswa').click();
+        };
+
+        document.getElementById('input-import-siswa').onchange = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    // Pastikan data dropdown sudah dimuat sebelum memproses import
+                    if (allJurusanData.length === 0 || allKelasData.length === 0) {
+                        await fetchDropdownData(); // Muat ulang jika kosong atau belum selesai
+                    }
+
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+
+                    if (json.length === 0) throw new Error("File Excel kosong atau tidak terbaca.");
+
+                    const n = new Date();
+                    const datePart = `${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}`;
+
+                    // Fungsi Helper untuk mencari ID berdasarkan Nama/ID yang diinput di Excel
+                    const resolveJurusan = (input) => {
+                        if (!input) return null;
+                        console.log(`Resolving Jurusan: Input='${input}'`);
+                        const found = allJurusanData.find(j => 
+                            j.id_jurusan === input || 
+                            j.nama_jurusan.toLowerCase() === String(input).toLowerCase()
+                        );
+                        console.log(`Resolved Jurusan: Input='${input}', Found='${found ? found.id_jurusan : 'null'}'`);
+                        return found ? found.id_jurusan : null;
+                    };
+
+                    const resolveKelas = (input) => {
+                        if (!input) return null;
+                        console.log(`Resolving Kelas: Input='${input}'`);
+                        const found = allKelasData.find(k => 
+                            k.id_kelas === input || 
+                            k.nama_kelas.toLowerCase() === String(input).toLowerCase()
+                        );
+                        console.log(`Resolved Kelas: Input='${input}', Found='${found ? found.id_kelas : 'null'}'`);
+                        return found ? found.id_kelas : null;
+                    };
+
+                    const invalidRows = [];
+                    // Pemetaan data dari Excel ke Database
+                    const payload = json.map((item, index) => {
+                        const resJur = resolveJurusan(item.id_jurusan);
+                        const resKel = resolveKelas(item.id_kelas);
+
+                        // Catat jika ada jurusan atau kelas yang tidak ditemukan
+                        if (item.id_jurusan && !resJur) invalidRows.push(`Baris ${index + 2}: Jurusan "${item.id_jurusan}" tidak valid.`);
+                        if (item.id_kelas && !resKel) invalidRows.push(`Baris ${index + 2}: Kelas "${item.id_kelas}" tidak valid.`);
+
+                        const r = Math.floor(1000 + Math.random() * 9000);
+                        return {
+                            id_siswa: `SIS.${datePart}-${r}${index}`, // Menjamin ID unik dalam satu batch
+                            nis: String(item.nis || ''),
+                            nisn_siswa: String(item.nisn_siswa || ''),
+                            nama_siswa: item.nama_siswa || '',
+                            jenis_kelamin: (item.jenis_kelamin || 'L').toUpperCase(),
+                            id_jurusan: resJur,
+                            id_kelas: resKel,
+                            status_aktif: item.status_aktif === undefined ? true : (String(item.status_aktif).toLowerCase() === 'true'),
+                            created_at: new Date().toISOString()
+                        };
+                    });
+
+                    // Jika ada error pada baris tertentu, batalkan proses upload
+                    if (invalidRows.length > 0) {
+                        const errorMsg = "Import dibatalkan karena data tidak valid:\n\n" + 
+                                       invalidRows.slice(0, 5).join('\n') + "\n" +
+                                       (invalidRows.length > 5 ? `\n...dan ${invalidRows.length - 5} lainnya.\n` : "") +
+                                       "Mohon periksa kembali file Excel Anda dan pastikan Jurusan/Kelas sesuai dengan data yang ada di sistem.";
+                        alert(errorMsg);
+                        throw new Error("Data referensi tidak valid.");
+                    }
+
+                    const res = await fetch(SB_URL_SISWA, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        showToast(`${json.length} data siswa berhasil diimport!`);
+                        modalImport.style.display = 'none'; // Tutup modal setelah sukses
+                        fetchSiswaData();
+                    } else {
+                        const errData = await res.json();
+                        throw new Error(errData.message || "Gagal menyimpan data import.");
+                    }
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    e.target.value = ''; // Reset input agar bisa pilih file yang sama lagi
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
 
         const modal = document.getElementById('modal-siswa');
         document.getElementById('btn-tambah-siswa').onclick = () => {
             isEditMode = false;
             document.getElementById('modal-title').innerText = "Tambah Data Siswa";
             document.getElementById('form-siswa').reset();
+            
+            document.getElementById('search-siswa').value = "";
+            applySearch();
+
+            updateKelasDropdown(""); // Reset dropdown kelas saat tambah baru
+
+            const n = new Date();
+            const r = Math.floor(1000 + Math.random() * 9000);
+            document.querySelector('input[name="id_siswa"]').value = `SIS.${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}-${r}`;
+            
             modal.style.display = 'flex';
         };
 
@@ -437,75 +856,90 @@
             isEditMode = true;
             document.getElementById('modal-title').innerText = "Edit Data Siswa";
             try {
-                const res = await fetch(`${SB_URL}?id_siswa=eq.${id}`, {
+                const res = await fetch(`${SB_URL_SISWA}?id_siswa=eq.${encodeURIComponent(id)}&select=*`, {
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
                 const data = await res.json();
                 if (data.length > 0) {
                     const s = data[0];
                     const form = document.getElementById('form-siswa');
+                    
+                    // Pastikan dropdown jurusan sudah terisi sebelum set value
+                    if (document.querySelector('select[name="id_jurusan"]').options.length <= 1) {
+                        await fetchDropdownData();
+                    }
+
                     form.id_siswa.value = s.id_siswa;
-                    form.nis.value = s.nis;
+                    form.nis.value = s.nis || '';
                     form.nisn_siswa.value = s.nisn_siswa || '';
-                    form.nama_siswa.value = s.nama_siswa;
-                    form.jurusan.value = s.jurusan;
-                    form.kelas.value = s.kelas;
-                    form.status_aktif.value = s.status_aktif.toString();
+                    form.nama_siswa.value = s.nama_siswa || '';
+                    form.jenis_kelamin.value = s.jenis_kelamin || '';
+                    form.id_jurusan.value = s.id_jurusan || '';
+                    
+                    // Sinkronkan dropdown kelas berdasarkan jurusan siswa tersebut
+                    updateKelasDropdown(s.id_jurusan, s.id_kelas);
+
+                    form.status_aktif.value = s.status_aktif !== undefined ? s.status_aktif.toString() : 'true';
                     modal.style.display = 'flex';
                 }
             } catch (err) { showToast(err.message, 'error'); }
         }
 
-        function triggerDelete(id) {
+        function deleteSiswa(id) {
             studentIdToDelete = id;
             document.getElementById('confirm-modal').style.display = 'flex';
         }
 
         document.getElementById('cancel-delete').onclick = () => document.getElementById('confirm-modal').style.display = 'none';
+        document.getElementById('confirm-modal').onclick = (e) => { if (e.target === document.getElementById('confirm-modal')) document.getElementById('confirm-modal').style.display = 'none'; };
 
         document.getElementById('confirm-delete-btn').onclick = async () => {
             const btn = document.getElementById('confirm-delete-btn');
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
-                const res = await fetch(`${SB_URL}?id_siswa=eq.${studentIdToDelete}`, {
+                const res = await fetch(`${SB_URL_SISWA}?id_siswa=eq.${encodeURIComponent(studentIdToDelete)}`, {
                     method: 'DELETE',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
                 if (res.ok) { showToast("Data siswa berhasil dihapus!"); fetchSiswaData(); }
                 else throw new Error("Gagal menghapus data.");
             } catch (err) { showToast(err.message, 'error'); }
-            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; document.getElementById('confirm-modal').style.display = 'none'; }
+            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; document.getElementById('confirm-modal').style.display = 'none'; studentIdToDelete = null; }
         };
 
         document.getElementById('form-siswa').onsubmit = async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             
             const formData = new FormData(e.target);
-            const rawData = Object.fromEntries(formData.entries());
-            const data = { ...rawData, status_aktif: rawData.status_aktif === "true" };
+            const data = Object.fromEntries(formData.entries());
+            
+            // Pastikan status_aktif dikirim sebagai boolean
+            const payload = { ...data };
+            if (payload.status_aktif !== undefined) payload.status_aktif = (payload.status_aktif === "true");
 
             try {
                 let res;
                 if (isEditMode) {
-                    res = await fetch(`${SB_URL}?id_siswa=eq.${data.id_siswa}`, {
+                    res = await fetch(`${SB_URL_SISWA}?id_siswa=eq.${encodeURIComponent(data.id_siswa)}`, {
                         method: 'PATCH',
-                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nis: data.nis, nisn_siswa: data.nisn_siswa, nama_siswa: data.nama_siswa, jurusan: data.jurusan, kelas: data.kelas, status_aktif: data.status_aktif })
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
                     });
                 } else {
                     delete data.id_siswa;
-                    res = await fetch(SB_URL, {
+                    res = await fetch(SB_URL_SISWA, {
                         method: 'POST',
                         headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(payload)
                     });
                 }
 
                 if (res.ok) {
                     showToast(isEditMode ? "Data siswa diperbarui!" : "Siswa baru berhasil ditambah!");
                     modal.style.display = 'none';
+                    document.getElementById('search-siswa').value = "";
                     fetchSiswaData();
                 } else { throw new Error("Gagal menyimpan ke database."); }
             } catch (err) { showToast(err.message, 'error'); }
