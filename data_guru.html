@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="https://iili.io/C9pr3Ss.md.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #4f46e5;
@@ -518,6 +519,7 @@
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item active"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -534,7 +536,13 @@
                         <i class="fas fa-search"></i>
                         <input type="text" id="search-guru" placeholder="Cari NIP atau Nama...">
                     </div>
-                    <button id="btn-tambah-guru" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Guru</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-import-guru" class="btn-add" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="fas fa-file-import"></i> Import Excel
+                        </button>
+                        <button id="btn-tambah-guru" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Guru</button>
+                    </div>
+                    <input type="file" id="input-import-guru" accept=".xlsx, .xls, .csv" style="display: none;">
                 </div>
                 <div class="table-responsive">
                     <table>
@@ -611,6 +619,32 @@
         <div class="photo-wrapper">
             <button id="close-photo-preview-btn" class="close-photo-btn">&times;</button>
             <img id="modal-photo-display" src="" alt="Foto Guru">
+        </div>
+    </div>
+
+    <!-- Modal Import Guru -->
+    <div class="modal-overlay" id="modal-import-guru">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <h3 style="margin-bottom: 15px;">Import Data Guru</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                Gunakan template yang disediakan untuk memastikan format data NIP dan tanggal lahir sesuai.
+            </p>
+            
+            <div style="background: var(--selector-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px dashed var(--nav-border);">
+                <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; color: var(--primary-color);">Langkah 1: Unduh Format</p>
+                <button id="btn-download-template-guru" class="btn-add" style="background: rgba(79, 70, 229, 0.1); color: var(--primary-color); border: 1px solid rgba(79, 70, 229, 0.2); box-shadow: none; width: 100%; justify-content: center;">
+                    <i class="fas fa-download"></i> Unduh Template Excel
+                </button>
+            </div>
+
+            <div style="background: var(--selector-bg); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px dashed var(--nav-border);">
+                <p style="font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; color: #10b981;">Langkah 2: Unggah Data</p>
+                <button id="btn-trigger-upload-guru" class="btn-add" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 100%; justify-content: center;">
+                    <i class="fas fa-upload"></i> Pilih File & Import
+                </button>
+            </div>
+
+            <button type="button" id="btn-close-import-guru" style="background:none; border:none; color: var(--text-muted); cursor:pointer; font-size: 0.85rem; padding: 5px;">Tutup</button>
         </div>
     </div>
 
@@ -845,6 +879,92 @@
             if (e.target === photoPreviewModal) closePhotoPreview(); 
         };
 
+        // --- Bulk Import Guru Logic ---
+        const modalImportGuru = document.getElementById('modal-import-guru');
+        
+        document.getElementById('btn-import-guru').onclick = () => {
+            modalImportGuru.style.display = 'flex';
+        };
+
+        document.getElementById('btn-close-import-guru').onclick = () => modalImportGuru.style.display = 'none';
+        modalImportGuru.onclick = (e) => { if (e.target === modalImportGuru) modalImportGuru.style.display = 'none'; };
+
+        document.getElementById('btn-download-template-guru').onclick = () => {
+            const templateData = [
+                {
+                    nip_guru: "198501012010011001",
+                    nama_guru: "Budiman, S.Pd.",
+                    tempat_lahir: "Bangka",
+                    tgl_lahir: "1985-01-01",
+                    no_hp_guru: "081234567890",
+                    alamat_guru: "Jl. Merdeka No. 12"
+                }
+            ];
+            const ws = XLSX.utils.json_to_sheet(templateData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template Import Guru");
+            XLSX.writeFile(wb, "template_import_guru.xlsx");
+            showToast("Template berhasil diunduh!");
+        };
+
+        document.getElementById('btn-trigger-upload-guru').onclick = () => {
+            document.getElementById('input-import-guru').click();
+        };
+
+        document.getElementById('input-import-guru').onchange = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+
+                    if (json.length === 0) throw new Error("File Excel kosong.");
+
+                    const n = new Date();
+                    const datePart = `${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}`;
+
+                    const payload = json.map((item, index) => {
+                        const r = Math.floor(1000 + Math.random() * 9000);
+                        return {
+                            id_guru: `IDG.${datePart}-${r}${index}`,
+                            nip_guru: String(item.nip_guru || ''),
+                            nama_guru: item.nama_guru || '',
+                            tempat_lahir: item.tempat_lahir || '',
+                            tgl_lahir: item.tgl_lahir || null,
+                            no_hp_guru: String(item.no_hp_guru || ''),
+                            alamat_guru: item.alamat_guru || '',
+                            created_at: new Date().toISOString()
+                        };
+                    });
+
+                    const res = await fetch(SB_URL, {
+                        method: 'POST',
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        showToast(`${json.length} data guru berhasil diimport!`);
+                        modalImportGuru.style.display = 'none';
+                        fetchGuruData();
+                    } else {
+                        const errData = await res.json();
+                        throw new Error(errData.message || "Gagal menyimpan data import.");
+                    }
+                } catch (err) {
+                    showToast(err.message, 'error');
+                } finally {
+                    e.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
         // Fungsi Edit Data (Placeholder)
         async function editGuru(id) {
             isEditMode = true;
@@ -992,11 +1112,12 @@
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
         document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-jadwal').href = `data_jadwal.html?role=${role}`;
         document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
         document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
         document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
         document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
-        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-laporan').href = `laporan_siswa.html?role=${role}`;
         document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
     </script>
 </body>
