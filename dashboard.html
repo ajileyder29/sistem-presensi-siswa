@@ -372,6 +372,7 @@
                 <li class="nav-item active"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -592,7 +593,7 @@
         document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
         document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
         document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
-        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-laporan').href = `laporan_rekap.html?role=${role}`;
         document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
 
         // Tampilkan widget AdminLTE jika role adalah Admin
