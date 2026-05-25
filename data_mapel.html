@@ -30,14 +30,17 @@
             --nav-border: rgba(255,255,255,0.1);
             --table-border: #374151;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* Form Grid Layout */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group-full { grid-column: span 2; }
+        .form-group label, .form-group-full label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
         body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        nav {
-            background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between;
-            align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur);
-            position: sticky; top: 0; z-index: 100;
-        }
+        
+        nav { background-color: var(--nav-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--nav-border); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 100; }
         .nav-logo { height: 32px; width: auto; }
         .nav-logo-link { display: flex; flex-direction: column; align-items: center; text-decoration: none; line-height: 1.2; }
         .nav-system-title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; margin-top: 4px; }
@@ -63,37 +66,82 @@
         .content { flex: 1; padding: 30px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .btn-add {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%);
-            color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer;
-            font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
+        
+        .btn-add { background: linear-gradient(135deg, var(--primary-color) 0%, #6366f1 100%); color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
         .btn-add:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
         .btn-add:active { transform: scale(0.95); }
+
+        .btn-add i, .btn-action i, .pagination-btn i { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-add:hover i, .btn-action:hover i, .pagination-btn:hover i { transform: scale(1.1); }
+
+        /* Search & Filter Wrapper Styles */
+        .controls-wrapper { display: flex; gap: 10px; flex: 1; min-width: 300px; flex-wrap: wrap; }
+        .search-wrapper { position: relative; flex: 1; min-width: 200px; max-width: 300px; }
+        .search-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+        .search-wrapper input, .filter-wrapper select { width: 100%; padding: 10px 15px 10px 40px; border-radius: 12px; border: 1px solid var(--nav-border); background: var(--bg-color); color: var(--text-color); font-size: 0.85rem; outline: none; transition: all 0.3s ease; }
+        .filter-wrapper { position: relative; min-width: 180px; }
+        .filter-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 0.9rem; z-index: 1; }
+        .filter-wrapper select { padding-left: 40px; cursor: pointer; appearance: none; }
+        .search-wrapper input:focus, .filter-wrapper select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
         .table-container { width: 100%; overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--table-border); }
         table { width: 100%; border-collapse: collapse; background: transparent; }
         th { background: rgba(79, 70, 229, 0.05); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; padding: 15px 20px; text-align: left; border-bottom: 2px solid rgba(79, 70, 229, 0.1); }
         td { padding: 15px 20px; border-bottom: 1px solid var(--table-border); font-size: 0.85rem; }
         tr:hover { background-color: rgba(79, 70, 229, 0.04); transition: all 0.2s ease; }
-        .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; }
+
+        .action-cell { display: flex; gap: 8px; }
+        .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; font-size: 0.9rem; }
+        .btn-action:active { transform: scale(0.92); }
         .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
         .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+
+        .id-badge { background: var(--selector-bg, rgba(0,0,0,0.05)); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; color: var(--primary-color); border: 1px solid var(--nav-border); }
+
+        /* Pagination Styles */
+        .pagination-container { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .pagination-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--nav-border); background: var(--modal-bg); color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.3s ease; }
+        .pagination-btn:hover:not(:disabled) { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Toast & Confirm Styles */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border-left: 4px solid var(--primary-color); transform: translateX(120%); transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+
+        .confirm-content { text-align: center; max-width: 400px !important; animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .icon-warning { font-size: 4rem; color: #ef4444; margin-bottom: 15px; }
+        .btn-cancel { background: var(--bg-color); color: var(--text-color); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-cancel:active { transform: scale(0.96); }
+
         .btn-logout { padding: 8px 16px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-logout:active { transform: scale(0.92); }
+
+        /* Theme Toggle Slider */
+        .theme-switch-wrapper { display: flex; align-items: center; margin-right: 15px; }
         .theme-switch { display: inline-block; height: 24px; position: relative; width: 46px; }
         .theme-switch input { display: none; }
-        .slider-toggle { background-color: var(--nav-border); border: 1px solid var(--nav-border); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; backdrop-filter: blur(5px); }
-        .slider-toggle:before { background-color: #fff; bottom: 3px; content: ""; height: 16px; left: 3px; position: absolute; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); width: 16px; border-radius: 50%; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .slider-toggle { background-color: var(--selector-bg, rgba(0,0,0,0.05)); border: 1px solid var(--nav-border); bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); border-radius: 34px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px; backdrop-filter: blur(5px); }
+        .slider-toggle:before { background-color: var(--white, #fff); bottom: 3px; content: ""; height: 16px; left: 3px; position: absolute; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); width: 16px; border-radius: 50%; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         input:checked + .slider-toggle { background-color: var(--primary-color); border-color: var(--primary-color); }
-        input:checked + .slider-toggle:before { transform: translateX(22px); }
+        input:checked + .slider-toggle:before { transform: translateX(22px); background-color: #f3f4f6; }
+        .slider-toggle i { font-size: 9px; z-index: 1; }
+        .fa-sun { color: #f1c40f; }
+        .fa-moon { color: #6b7280; }
+        body.dark .fa-moon { color: #f3f4f6; }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+        .modal-content { background: var(--modal-bg); width: 90%; max-width: 550px; border-radius: 12px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
         .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--nav-border); border-radius: 6px; background: var(--bg-color); color: var(--text-color); outline: none; }
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 10px; border-left: 4px solid #10b981; transform: translateX(120%); transition: all 0.3s ease; backdrop-filter: blur(10px); }
-        .toast.show { transform: translateX(0); }
+
         @media (max-width: 768px) {
             nav { padding: 15px 20px; }
             .content { padding: 20px 15px 100px 15px; }
@@ -146,6 +194,7 @@
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item active"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -158,6 +207,18 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Daftar Mata Pelajaran</h2>
+                    <div class="controls-wrapper">
+                        <div class="filter-wrapper">
+                            <i class="fas fa-graduation-cap"></i>
+                            <select id="filter-jurusan">
+                                <option value="">Semua Jurusan</option>
+                            </select>
+                        </div>
+                        <div class="search-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-mapel" placeholder="Cari Nama Mata Pelajaran...">
+                        </div>
+                    </div>
                     <button id="btn-tambah-mapel" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Mapel</button>
                 </div>
                 <div class="table-container">
@@ -165,6 +226,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>Kode Mapel</th>
                                 <th>Nama Mata Pelajaran</th>
                                 <th>Jurusan</th>
                                 <th>Aksi</th>
@@ -173,6 +235,7 @@
                         <tbody id="table-body-mapel"></tbody>
                     </table>
                 </div>
+                <div id="pagination-container" class="pagination-container"></div>
             </div>
         </main>
     </div>
@@ -183,12 +246,16 @@
             <form id="form-mapel">
                 <input type="hidden" name="id_mapel">
                 <div class="form-group">
+                    <label>Kode Mata Pelajaran</label>
+                    <input type="text" name="kode_mapel" required placeholder="Contoh: PWK" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
                     <label>Nama Mata Pelajaran</label>
                     <input type="text" name="nama_mapel" required placeholder="Contoh: Pemrograman Web">
                 </div>
                 <div class="form-group">
                     <label>Jurusan</label>
-                    <select name="id_jurusan" id="select-jurusan" required></select>
+                    <select name="id_jurusan" id="select-jurusan"></select>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="button" class="btn-add" id="btn-close-modal" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
@@ -199,13 +266,13 @@
     </div>
 
     <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-content" style="text-align: center; max-width: 400px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
+        <div class="modal-content confirm-content">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
             <h3>Hapus Mapel?</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 20px;">Data ini akan dihapus permanen.</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-add" id="cancel-delete" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
-                <button class="btn-add" id="confirm-delete-btn" style="background:#ef4444; flex:1; justify-content:center;">Ya, Hapus</button>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">Data yang dihapus tidak dapat dipulihkan kembali. Tindakan ini bersifat permanen.</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-action btn-cancel" id="cancel-delete" style="width: auto; padding: 10px 25px;">Batal</button>
+                <button class="btn-action btn-delete" id="confirm-delete-btn" style="width: auto; padding: 10px 25px;">Ya, Hapus</button>
             </div>
         </div>
     </div>
@@ -219,15 +286,23 @@
 
         let isEditMode = false;
         let mapelIdToDelete = null;
+        let allMapel = [];
+        let filteredMapel = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i> <span>${message}</span>`;
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         async function fetchJurusan() {
@@ -235,39 +310,114 @@
                 const res = await fetch(`${SB_URL_JURUSAN}?select=*`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
                 const data = await res.json();
                 const select = document.getElementById('select-jurusan');
-                select.innerHTML = '<option value="">Pilih Jurusan</option>';
-                data.forEach(j => select.innerHTML += `<option value="${j.id_jurusan}">${j.nama_jurusan}</option>`);
+                const filterSelect = document.getElementById('filter-jurusan');
+                console.log("Data Jurusan untuk dropdown:", data);
+                select.innerHTML = '<option value="">Mata Pelajaran Umum (Semua Jurusan)</option>';
+                filterSelect.innerHTML = '<option value="">Semua Jurusan</option>';
+                data.forEach(j => {
+                    const opt = `<option value="${j.id_jurusan}">${j.nama_jurusan}</option>`;
+                    select.innerHTML += opt;
+                    filterSelect.innerHTML += opt;
+                });
             } catch (err) { console.error(err); }
         }
 
         async function fetchMapel() {
             const tbody = document.getElementById('table-body-mapel');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Memuat...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Memuat...</td></tr>';
             try {
-                const res = await fetch(`${SB_URL_MAPEL}?select=*,tb_jurusan(nama_jurusan)&order=nama_mapel.asc`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
+                // Menggunakan !id_jurusan untuk menentukan relasi secara eksplisit
+                const res = await fetch(`${SB_URL_MAPEL}?select=*,tb_jurusan!id_jurusan(nama_jurusan)&order=created_at.desc.nullslast`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
+                
                 const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Gagal mengambil data mata pelajaran.");
+
+                allMapel = Array.isArray(data) ? data : [];
+                console.log("All Mapel Data (after fetch):", allMapel); // Debugging: Lihat struktur data mapel
+                applyFilters();
+            } catch (err) { showToast(err.message, 'error'); }
+        }
+
+        function renderMapelTable(mapel, startIndex = 0) {
+            const tbody = document.getElementById('table-body-mapel');
                 tbody.innerHTML = '';
-                data.forEach((m, idx) => {
+            if (mapel.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                document.getElementById('pagination-container').innerHTML = '';
+                return;
+            }
+            mapel.forEach((m, idx) => {
+                const isUmum = !m.id_jurusan;
+                const namaJurusan = isUmum ? 'Semua Jurusan' : (m.tb_jurusan ? (Array.isArray(m.tb_jurusan) ? m.tb_jurusan[0]?.nama_jurusan : m.tb_jurusan.nama_jurusan) : '-');
+                const badgeStyle = isUmum 
+                    ? "background:rgba(16,185,129,0.1); color:#10b981; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600;" 
+                    : "background:rgba(79,70,229,0.1); color:var(--primary-color); padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600;";
+
                     tbody.innerHTML += `<tr>
-                        <td>${idx + 1}</td>
+                        <td>${startIndex + idx + 1}</td>
+                        <td><span class="id-badge">${m.kode_mapel || '-'}</span></td>
                         <td><strong>${m.nama_mapel}</strong></td>
-                        <td><span style="background:rgba(79,70,229,0.1); color:var(--primary-color); padding:2px 8px; border-radius:4px; font-size:0.75rem;">${m.tb_jurusan ? m.tb_jurusan.nama_jurusan : '-'}</span></td>
+                        <td><span style="${badgeStyle}">${namaJurusan}</span></td>
                         <td>
-                            <div style="display:flex; gap:8px">
-                                <button class="btn-action btn-edit" onclick="editMapel(${m.id_mapel})"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete" onclick="triggerDelete(${m.id_mapel})"><i class="fas fa-trash"></i></button>
+                            <div class="action-cell">
+                                <button class="btn-action btn-edit" onclick="editMapel('${m.id_mapel}')" title="Edit Data"><i class="fas fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="triggerDelete('${m.id_mapel}')" title="Hapus Data"><i class="fas fa-trash-can"></i></button>
                             </div>
                         </td>
                     </tr>`;
-                });
-            } catch (err) { showToast(err.message, 'error'); }
+            });
         }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-mapel').value.toLowerCase();
+            const jurId = document.getElementById('filter-jurusan').value;
+            console.log(`Menerapkan filter: SearchTerm='${searchTerm}', JurusanID='${jurId}'`);
+            
+            filteredMapel = allMapel.filter(m => {
+                const matchSearch = (m.nama_mapel || "").toLowerCase().includes(searchTerm) || 
+                                   (m.kode_mapel || "").toLowerCase().includes(searchTerm);
+                // Logika: Tampilkan jika "Semua" dipilih OR ID Jurusan cocok OR Mata Pelajaran bersifat Umum (NULL)
+                const matchJurusan = !jurId || m.id_jurusan == jurId || !m.id_jurusan;
+                console.log(`  Mapel: ${m.nama_mapel}, m.id_jurusan: '${m.id_jurusan}', jurId: '${jurId}', !jurId: ${!jurId}, !m.id_jurusan: ${!m.id_jurusan}, matchJurusan: ${matchJurusan}`); // Debugging: Perbandingan detail
+                return matchSearch && matchJurusan;
+            });
+            
+            currentPage = 1;
+            displayTableAndPagination();
+        }
+
+        function displayTableAndPagination() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = filteredMapel.slice(start, end);
+            renderMapelTable(paginatedItems, start);
+            renderPagination(filteredMapel.length);
+        }
+
+        function renderPagination(totalItems) {
+            const container = document.getElementById('pagination-container');
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = () => { currentPage = i; displayTableAndPagination(); };
+                container.appendChild(btn);
+            }
+        }
+
+        document.getElementById('search-mapel').addEventListener('input', applyFilters);
+        document.getElementById('filter-jurusan').addEventListener('change', applyFilters);
 
         const modal = document.getElementById('modal-mapel');
         document.getElementById('btn-tambah-mapel').onclick = () => {
             isEditMode = false;
             document.getElementById('modal-title').innerText = "Tambah Mapel";
             document.getElementById('form-mapel').reset();
+            document.getElementById('search-mapel').value = "";
+            document.getElementById('filter-jurusan').value = "";
             modal.style.display = 'flex';
         };
         document.getElementById('btn-close-modal').onclick = () => modal.style.display = 'none';
@@ -276,12 +426,13 @@
             isEditMode = true;
             document.getElementById('modal-title').innerText = "Edit Mapel";
             try {
-                const res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${id}`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
+                const res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${encodeURIComponent(id)}`, { headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
                 const data = await res.json();
                 if (data.length > 0) {
                     const m = data[0];
                     const form = document.getElementById('form-mapel');
                     form.id_mapel.value = m.id_mapel;
+                    form.kode_mapel.value = m.kode_mapel || '';
                     form.nama_mapel.value = m.nama_mapel;
                     form.id_jurusan.value = m.id_jurusan;
                     modal.style.display = 'flex';
@@ -292,44 +443,66 @@
         function triggerDelete(id) { mapelIdToDelete = id; document.getElementById('confirm-modal').style.display = 'flex'; }
         document.getElementById('cancel-delete').onclick = () => document.getElementById('confirm-modal').style.display = 'none';
         document.getElementById('confirm-delete-btn').onclick = async () => {
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
-                const res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${mapelIdToDelete}`, { method: 'DELETE', headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
-                if (res.ok) { showToast("Dihapus!"); fetchMapel(); }
+                const res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${encodeURIComponent(mapelIdToDelete)}`, { method: 'DELETE', headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` } });
+                if (res.ok) { showToast("Mata pelajaran berhasil dihapus!"); fetchMapel(); }
                 document.getElementById('confirm-modal').style.display = 'none';
             } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; }
         };
 
         document.getElementById('form-mapel').onsubmit = async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             const fd = new FormData(e.target);
             const data = Object.fromEntries(fd.entries());
+            
+            // Menyiapkan payload agar hanya mengirim kolom yang diperlukan
+            let payload = {
+                kode_mapel: data.kode_mapel ? data.kode_mapel.toUpperCase() : null,
+                nama_mapel: data.nama_mapel,
+                id_jurusan: data.id_jurusan || null // Jika kosong, set NULL di Supabase
+            };
+
             try {
                 let res;
                 if (isEditMode) {
-                    res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${data.id_mapel}`, {
+                    res = await fetch(`${SB_URL_MAPEL}?id_mapel=eq.${encodeURIComponent(data.id_mapel)}`, {
                         method: 'PATCH',
-                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nama_mapel: data.nama_mapel, id_jurusan: data.id_jurusan })
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
                     });
                 } else {
-                    delete data.id_mapel;
+                    const n = new Date();
+                    const r = Math.floor(1000 + Math.random() * 9000);
+                    payload.id_mapel = `MPL.${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}-${r}`;
+                    
                     res = await fetch(SB_URL_MAPEL, {
                         method: 'POST',
-                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
                     });
                 }
-                if (res.ok) { showToast("Berhasil!"); modal.style.display = 'none'; fetchMapel(); }
+                if (res.ok) { showToast(isEditMode ? "Data berhasil diperbarui!" : "Mata pelajaran baru berhasil ditambahkan!"); modal.style.display = 'none'; fetchMapel(); }
+                else { 
+                    const err = await res.json(); 
+                    console.error("Detail Error Supabase:", err);
+                    throw new Error(err.message || err.hint || "Gagal menyimpan data ke database."); 
+                }
             } catch (err) { showToast(err.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
         };
 
-        // Theme & Canvas Logic
+        // Theme Logic
         const themeCheckbox = document.getElementById('theme-checkbox');
-        if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark'); themeCheckbox.checked = true; }
+        const body = document.body;
+        if (localStorage.getItem('theme') === 'dark') { body.classList.add('dark'); themeCheckbox.checked = true; }
         themeCheckbox.addEventListener('change', () => {
-            const isDark = themeCheckbox.checked;
-            document.body.classList.toggle('dark', isDark);
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            if (themeCheckbox.checked) { body.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+            else { body.classList.remove('dark'); localStorage.setItem('theme', 'light'); }
         });
 
         const canvas = document.getElementById('bg-canvas');
