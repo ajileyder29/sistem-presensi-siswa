@@ -82,6 +82,9 @@
         }
         .btn-add:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); }
         .btn-add:active { transform: scale(0.95); }
+        
+        .btn-add i, .btn-action i, .pagination-btn i { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .btn-add:hover i, .btn-action:hover i, .pagination-btn:hover i { transform: scale(1.1); }
 
         /* Modern Table Styles */
         .table-container {
@@ -120,10 +123,110 @@
         body.dark th { background: rgba(255, 255, 255, 0.03); border-bottom-color: rgba(255, 255, 255, 0.1); }
         body.dark tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
 
-        .btn-action { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border: none; }
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+        /* Search Wrapper Styles */
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 350px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--nav-border);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-wrapper input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: var(--modal-bg);
+        }
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: none;
+            font-size: 0.9rem;
+        }
         .btn-action:active { transform: scale(0.92); }
         .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
         .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-delete:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+
+        .id-badge {
+            background: var(--selector-bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            border: 1px solid var(--nav-border);
+        }
+
+        /* Pagination Styles */
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .pagination-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--nav-border);
+            background: var(--modal-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .pagination-btn:hover:not(:disabled) { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Toast & Confirm Styles */
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+
+        .confirm-content { 
+            text-align: center; max-width: 400px !important; 
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .icon-warning { font-size: 4rem; color: #ef4444; margin-bottom: 15px; }
+        .btn-cancel { 
+            background: var(--bg-color); color: var(--text-color);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-cancel:active { transform: scale(0.96); }
 
         .btn-logout {
             padding: 8px 16px;
@@ -154,7 +257,7 @@
         .theme-switch input { display: none; }
 
         .slider-toggle {
-            background-color: var(--nav-border); /* Use nav-border for consistency */
+            background-color: var(--selector-bg, rgba(0,0,0,0.05));
             border: 1px solid var(--nav-border);
             bottom: 0;
             cursor: pointer;
@@ -162,7 +265,7 @@
             position: absolute;
             right: 0;
             top: 0;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border-radius: 34px;
             display: flex;
             align-items: center;
@@ -178,7 +281,7 @@
             height: 16px;
             left: 3px;
             position: absolute;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             width: 16px;
             border-radius: 50%;
             z-index: 2;
@@ -265,6 +368,7 @@
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item active"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -278,6 +382,10 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Daftar Data Kelas</h2>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-kelas" placeholder="Cari Nama Kelas atau Jurusan...">
+                    </div>
                     <button id="btn-tambah-kelas" class="btn-add"><i class="fas fa-plus-circle"></i> Tambah Kelas</button>
                 </div>
                 <div class="table-container">
@@ -285,6 +393,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>ID Kelas</th>
                                 <th>Nama Kelas</th>
                                 <th>Tingkat</th>
                                 <th>Jurusan</th>
@@ -296,6 +405,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="pagination-container" class="pagination-container"></div>
             </div>
         </main>
     </div>
@@ -312,7 +422,7 @@
                 </div>
                 <div class="form-group">
                     <label>Tingkat</label>
-                    <select name="tingkat" required>
+                    <select name="tingkat_kelas" required>
                         <option value="X">X</option>
                         <option value="XI">XI</option>
                         <option value="XII">XII</option>
@@ -334,13 +444,15 @@
 
     <!-- Modal Konfirmasi Hapus -->
     <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-content" style="text-align: center; max-width: 400px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 15px;"></i>
-            <h3>Hapus Data Kelas?</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 10px 0 20px;">Tindakan ini tidak dapat dibatalkan.</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-add" id="cancel-delete" style="background:#6b7280; flex:1; justify-content:center;">Batal</button>
-                <button type="button" class="btn-add" id="confirm-delete-btn" style="background:#ef4444; flex:1; justify-content:center;">Ya, Hapus</button>
+        <div class="modal-content confirm-content">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 style="margin-bottom: 10px;">Hapus Data Kelas?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 0.9rem;">
+                Data yang dihapus tidak dapat dipulihkan kembali. Tindakan ini bersifat permanen.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-action btn-cancel" id="cancel-delete" style="width: auto; padding: 10px 25px;">Batal</button>
+                <button class="btn-action btn-delete" id="confirm-delete-btn" style="width: auto; padding: 10px 25px;">Ya, Hapus</button>
             </div>
         </div>
     </div>
@@ -355,17 +467,38 @@
 
         let isEditMode = false;
         let classIdToDelete = null;
+        let allClasses = []; // Global state untuk menyimpan data asli
+        let filteredClasses = []; // Data yang difilter
+        let currentPage = 1;
+        const itemsPerPage = 8;
         let jurusanData = []; // To store fetched jurusan data
 
         // --- Utility Functions ---
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '-';
+            
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            const h = String(date.getHours()).padStart(2, '0');
+            const i = String(date.getMinutes()).padStart(2, '0');
+            return `${d}/${m}/${y} ${h}:${i}`;
+        }
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i> <span>${message}</span>`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         // --- Authentication & Authorization Check ---
@@ -399,38 +532,132 @@
         // --- CRUD Operations ---
         async function fetchKelasData() {
             const tbody = document.getElementById('table-body-kelas');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>';
             try {
-                const res = await fetch(`${SB_URL_KELAS}?select=*,tb_jurusan(nama_jurusan)&order=tingkat.asc,nama_kelas.asc`, {
+                const res = await fetch(`${SB_URL_KELAS}?select=*,tb_jurusan!fk_kelas_ke_jurusan(*)&order=created_at.desc.nullslast`, {
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
-                const classes = await res.json();
-                tbody.innerHTML = '';
-                if (classes.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada data kelas.</td></tr>'; return; }
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || "Gagal mengambil data kelas.");
+                }
+                allClasses = await res.json();
                 
-                classes.forEach((cls, idx) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td><strong>${cls.nama_kelas}</strong></td>
-                            <td>${cls.tingkat}</td>
-                            <td><span style="background:rgba(79,70,229,0.1); color:var(--primary-color); padding:2px 8px; border-radius:4px; font-size:0.75rem;">${cls.tb_jurusan ? cls.tb_jurusan.nama_jurusan : '-'}</span></td>
-                            <td>
-                                <div style="display:flex; gap:8px;">
-                                    <button class="btn-action btn-edit" onclick="editKelas('${cls.id_kelas}')"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-action btn-delete" onclick="triggerDelete('${cls.id_kelas}')"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>`;
+                // Sorting fallback di sisi klien untuk memastikan data terbaru di atas
+                allClasses.sort((a, b) => {
+                    const dateA = new Date(a.created_at || 0);
+                    const dateB = new Date(b.created_at || 0);
+                    return dateB - dateA;
                 });
+
+                filteredClasses = [...allClasses];
+                currentPage = 1;
+                displayTableAndPagination();
             } catch (err) { showToast(err.message, 'error'); }
         }
+
+        function renderKelasTable(classes, startIndex = 0) {
+            const tbody = document.getElementById('table-body-kelas');
+            tbody.innerHTML = '';
+            if (classes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                document.getElementById('pagination-container').innerHTML = '';
+                return;
+            }
+            classes.forEach((cls, idx) => {
+                let namaJurusan = '-';
+                if (cls.tb_jurusan) {
+                    namaJurusan = Array.isArray(cls.tb_jurusan) ? (cls.tb_jurusan[0]?.nama_jurusan || '-') : (cls.tb_jurusan.nama_jurusan || '-');
+                }
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${startIndex + idx + 1}</td>
+                        <td><span class="id-badge">${cls.id_kelas || '-'}</span></td>
+                        <td><strong>${cls.nama_kelas}</strong></td>
+                        <td>${cls.tingkat_kelas}</td>
+                        <td><span style="background:rgba(79,70,229,0.1); color:var(--primary-color); padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600;">${namaJurusan}</span></td>
+                        <td>
+                            <div class="action-cell">
+                                <button class="btn-action btn-edit" onclick="editKelas('${cls.id_kelas}')" title="Edit Data">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="deleteKelas('${cls.id_kelas}')" title="Hapus Data">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function displayTableAndPagination() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = filteredClasses.slice(start, end);
+            renderKelasTable(paginatedItems, start);
+            renderPagination(filteredClasses.length);
+        }
+
+        function renderPagination(totalItems) {
+            const container = document.getElementById('pagination-container');
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => { currentPage--; displayTableAndPagination(); };
+            container.appendChild(prevBtn);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.innerText = i;
+                pageBtn.onclick = () => { currentPage = i; displayTableAndPagination(); };
+                container.appendChild(pageBtn);
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => { currentPage++; displayTableAndPagination(); };
+            container.appendChild(nextBtn);
+        }
+
+        function applySearch() {
+            const searchTerm = document.getElementById('search-kelas').value.toLowerCase();
+            filteredClasses = allClasses.filter(c => {
+                const namaKelas = (c.nama_kelas || "").toLowerCase();
+                const tingkat = (c.tingkat_kelas || "").toLowerCase();
+                const idKelas = (c.id_kelas || "").toLowerCase();
+                const jurusan = c.tb_jurusan ? (Array.isArray(c.tb_jurusan) ? (c.tb_jurusan[0]?.nama_jurusan || "") : (c.tb_jurusan.nama_jurusan || "")) : "";
+                
+                return namaKelas.includes(searchTerm) || 
+                       jurusan.toLowerCase().includes(searchTerm) || 
+                       tingkat.includes(searchTerm) ||
+                       idKelas.includes(searchTerm);
+            });
+            currentPage = 1;
+            displayTableAndPagination();
+        }
+        document.getElementById('search-kelas').addEventListener('input', applySearch);
 
         const modal = document.getElementById('modal-kelas');
         document.getElementById('btn-tambah-kelas').onclick = () => {
             isEditMode = false;
             document.getElementById('modal-title').innerText = "Tambah Data Kelas";
             document.getElementById('form-kelas').reset();
+            
+            document.getElementById('search-kelas').value = ""; // Bersihkan kolom pencarian
+            applySearch(); // Reset tampilan agar data baru terlihat di atas
+            
+            // Generate ID Otomatis: KLS.DDMMYY-XXXX
+            const n = new Date();
+            const r = Math.floor(1000 + Math.random() * 9000);
+            document.querySelector('input[name="id_kelas"]').value = `KLS.${String(n.getDate()).padStart(2,'0')}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getFullYear()).slice(-2)}-${r}`;
             modal.style.display = 'flex';
         };
 
@@ -441,7 +668,7 @@
             isEditMode = true;
             document.getElementById('modal-title').innerText = "Edit Data Kelas";
             try {
-                const res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${id}&select=*`, {
+                const res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${encodeURIComponent(id)}&select=*`, {
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
                 const data = await res.json();
@@ -450,64 +677,85 @@
                     const form = document.getElementById('form-kelas');
                     form.id_kelas.value = cls.id_kelas;
                     form.nama_kelas.value = cls.nama_kelas;
-                    form.tingkat.value = cls.tingkat;
+                    form.tingkat_kelas.value = cls.tingkat_kelas;
                     form.id_jurusan.value = cls.id_jurusan;
                     modal.style.display = 'flex';
                 }
             } catch (err) { showToast(err.message, 'error'); }
         }
 
-        function triggerDelete(id) {
+        function deleteKelas(id) {
             classIdToDelete = id;
             document.getElementById('confirm-modal').style.display = 'flex';
         }
 
         document.getElementById('cancel-delete').onclick = () => document.getElementById('confirm-modal').style.display = 'none';
+        document.getElementById('confirm-modal').onclick = (e) => { if (e.target === document.getElementById('confirm-modal')) document.getElementById('confirm-modal').style.display = 'none'; };
 
         document.getElementById('confirm-delete-btn').onclick = async () => {
             const btn = document.getElementById('confirm-delete-btn');
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
-                const res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${classIdToDelete}`, {
+                const res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${encodeURIComponent(classIdToDelete)}`, {
                     method: 'DELETE',
                     headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
                 });
                 if (res.ok) { showToast("Data kelas berhasil dihapus!"); fetchKelasData(); }
                 else throw new Error("Gagal menghapus data.");
             } catch (err) { showToast(err.message, 'error'); }
-            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; document.getElementById('confirm-modal').style.display = 'none'; }
+            finally { btn.disabled = false; btn.innerText = "Ya, Hapus"; document.getElementById('confirm-modal').style.display = 'none'; classIdToDelete = null; }
         };
 
         document.getElementById('form-kelas').onsubmit = async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
+            
+            // Menyiapkan payload data
+            let payload = {
+                nama_kelas: data.nama_kelas,
+                tingkat_kelas: data.tingkat_kelas,
+                id_jurusan: data.id_jurusan // Gunakan string karena format ID adalah 'JUR.XXXXX'
+            };
+
+            if (!isEditMode) { // For POST requests (new data), include the generated id_kelas
+                payload.id_kelas = data.id_kelas;
+            }
+            
+
+            console.log("Payload data kelas:", payload);
 
             try {
                 let res;
                 if (isEditMode) {
-                    res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${data.id_kelas}`, {
+                    res = await fetch(`${SB_URL_KELAS}?id_kelas=eq.${encodeURIComponent(data.id_kelas)}`, {
                         method: 'PATCH',
-                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nama_kelas: data.nama_kelas, tingkat: data.tingkat, id_jurusan: data.id_jurusan })
+                        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                        body: JSON.stringify(payload)
                     });
                 } else {
-                    delete data.id_kelas; // id_kelas is auto-increment
                     res = await fetch(SB_URL_KELAS, {
                         method: 'POST',
                         headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(payload) // Now payload includes id_kelas for POST
                     });
                 }
 
                 if (res.ok) {
                     showToast(isEditMode ? "Data kelas diperbarui!" : "Kelas baru berhasil ditambah!");
                     modal.style.display = 'none';
+                    document.getElementById('search-kelas').value = ""; // Reset pencarian
                     fetchKelasData();
-                } else { throw new Error("Gagal menyimpan ke database."); }
+                } else {
+                    let errorResponse;
+                    try { errorResponse = await res.json(); } catch(e) { errorResponse = { message: "Error tidak diketahui" }; }
+                    
+                    console.error("Error dari Supabase:", errorResponse);
+                    throw new Error(errorResponse.message || "Gagal menyimpan ke database.");
+                }
             } catch (err) { showToast(err.message, 'error'); }
             finally { btn.disabled = false; btn.innerText = "Simpan Data"; }
         };
@@ -549,9 +797,13 @@
         }
 
         themeCheckbox.addEventListener('change', () => {
-            const isDark = themeCheckbox.checked;
-            body.classList.toggle('dark', isDark);
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            if (themeCheckbox.checked) {
+                body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
         });
 
         // --- Navigation Links Update ---
@@ -559,11 +811,12 @@
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
         document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-jadwal').href = `data_jadwal.html?role=${role}`;
         document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
         document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
         document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
         document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
-        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-laporan').href = `laporan_siswa.html?role=${role}`;
         document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
 
         // --- Logout Button ---
