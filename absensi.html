@@ -12,6 +12,7 @@
             --primary-color: #4f46e5;
             --bg-color: #f3f4f6;
             --card-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
             --text-color: #1f2937;
             --text-muted: #6b7280;
             --nav-bg: rgba(255, 255, 255, 0.7);
@@ -22,6 +23,7 @@
         body.dark {
             --bg-color: #111827;
             --card-bg: rgba(15, 23, 42, 0.4);
+            --modal-bg: #1f2937;
             --text-color: #f3f4f6;
             --text-muted: #9ca3af;
             --nav-bg: rgba(15, 23, 42, 0.6);
@@ -65,14 +67,37 @@
         .nav-item.active a { background: rgba(79, 70, 229, 0.1); }
         .content { flex: 1; padding: 30px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .header-absensi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .date-picker { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--nav-border); background: var(--bg-color); color: var(--text-color); }
+        .header-absensi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--nav-border); padding-bottom: 20px; }
+        .filter-absensi { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .form-group-abs { display: flex; flex-direction: column; gap: 5px; }
+        .form-group-abs label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+        .date-picker, .select-abs { padding: 10px 15px; border-radius: 10px; border: 1px solid var(--nav-border); background: var(--bg-color); color: var(--text-color); outline: none; transition: all 0.3s ease; }
+        .date-picker:focus, .select-abs:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--table-border); }
-        th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; }
-        .status-group { display: flex; gap: 10px; }
-        .status-item { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; cursor: pointer; }
+        th { background: rgba(79, 70, 229, 0.05); color: var(--primary-color); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; padding: 15px; text-align: left; border-bottom: 2px solid rgba(79, 70, 229, 0.1); }
+        td { padding: 15px; border-bottom: 1px solid var(--table-border); font-size: 0.85rem; vertical-align: middle; }
+        
+        .status-group { display: flex; gap: 8px; }
+        .status-btn { 
+            padding: 6px 12px; border-radius: 8px; border: 1px solid var(--nav-border); background: var(--bg-color); 
+            color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .status-btn:hover { transform: translateY(-2px); }
+        
+        input[type="radio"] { display: none; }
+        input[value="H"]:checked + .status-btn { background: #10b981; color: white; border-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        input[value="S"]:checked + .status-btn { background: #f59e0b; color: white; border-color: #f59e0b; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); }
+        input[value="I"]:checked + .status-btn { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        input[value="A"]:checked + .status-btn { background: #ef4444; color: white; border-color: #ef4444; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); }
+
+        .input-ket { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--nav-border); background: transparent; color: var(--text-color); font-size: 0.8rem; }
+        .input-ket:focus { border-color: var(--primary-color); background: var(--bg-color); }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; display: block; opacity: 0.5; }
         
         .btn-logout {
             padding: 8px 16px;
@@ -86,11 +111,45 @@
         .btn-logout:active { transform: scale(0.92); }
         .btn-logout:hover { opacity: 0.8; }
 
+        .footer-content {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
         .btn-save { 
             background-color: var(--primary-color); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; width: 100%; margin-top: 20px; font-weight: 600; 
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .btn-save:active { transform: scale(0.96); }
+        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent !important; color: var(--text-color) !important; border: 1.5px solid var(--nav-border) !important; }
+        .btn-secondary:hover { background: var(--bg-color) !important; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { 
+            background: var(--modal-bg); color: var(--text-color); padding: 15px 25px; 
+            border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px; 
+            border-left: 4px solid #10b981; transform: translateX(120%); transition: all 0.3s ease; 
+            backdrop-filter: blur(10px);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { border-left-color: #ef4444; }
+
+        /* Styles untuk Modal Sukses */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { 
+            background: var(--modal-bg); width: 92%; max-width: 420px; border-radius: 24px; padding: 45px 35px; 
+            text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--nav-border); position: relative;
+        }
+        .modal-content::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--primary-color), #10b981); border-radius: 24px 24px 0 0; }
+        .modal-content h3 { color: var(--text-color); font-weight: 700; margin-bottom: 12px; font-size: 1.5rem; }
+        .modal-content p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px; font-weight: 400; }
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .main-sidebar {
             width: 100%;
@@ -264,6 +323,7 @@
                 <li class="nav-item"><a href="dashboard.html" id="link-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a href="data_siswa.html" id="link-siswa"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
                 <li class="nav-item"><a href="data_guru.html" id="link-guru"><i class="fas fa-chalkboard-teacher"></i> Data Guru</a></li>
+                <li class="nav-item"><a href="data_jadwal.html" id="link-jadwal"><i class="fas fa-calendar-alt"></i> Data Jadwal</a></li>
                 <li class="nav-item active"><a href="absensi.html" id="link-absensi"><i class="fas fa-calendar-check"></i> Absensi</a></li>
                 <li class="nav-item"><a href="data_mapel.html" id="link-mapel"><i class="fas fa-book"></i> Data Mapel</a></li>
                 <li class="nav-item"><a href="data_kelas.html" id="link-kelas"><i class="fas fa-school"></i> Data Kelas</a></li>
@@ -275,9 +335,24 @@
         <main class="content">
             <div class="card">
                 <div class="header-absensi">
-                    <h2>Presensi Harian</h2>
-                    <input type="date" id="tgl_absensi" class="date-picker">
+                    <h2 style="display: flex; align-items: center; gap: 10px;"><i class="fas fa-calendar-check" style="color: var(--primary-color);"></i> Presensi Siswa</h2>
+                    <div class="form-group-abs">
+                        <label>Tanggal Absensi</label>
+                        <input type="date" id="tgl_absensi" class="date-picker">
+                    </div>
                 </div>
+
+                <div class="filter-absensi">
+                    <div class="form-group-abs">
+                        <label>Pilih Kelas</label>
+                        <select id="select-kelas" class="select-abs"><option value="">-- Pilih Kelas --</option></select>
+                    </div>
+                    <div class="form-group-abs">
+                        <label>Mata Pelajaran (Jadwal)</label>
+                        <select id="select-jadwal" class="select-abs" disabled><option value="">-- Pilih Jadwal --</option></select>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -289,7 +364,7 @@
                             </tr>
                         </thead>
                         <tbody id="table-absensi">
-                            <!-- Memuat data guru sebagai contoh daftar yang diabsen -->
+                            <tr><td colspan="4" class="empty-state"><i class="fas fa-filter"></i>Silakan pilih kelas dan jadwal terlebih dahulu.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -301,53 +376,236 @@
         </main>
     </div>
 
+    <!-- Modal Konfirmasi Simpan -->
+    <div class="modal-overlay" id="confirm-save-modal">
+        <div class="modal-content">
+            <div style="margin-bottom: 20px;">
+                <i class="fas fa-question-circle" style="font-size: 5.5rem; color: var(--primary-color); filter: drop-shadow(0 4px 10px rgba(79, 70, 229, 0.3));"></i>
+            </div>
+            <h3>Simpan Presensi?</h3>
+            <p>Pastikan data sudah benar. Setelah disimpan, data hari ini masih bisa diperbarui hingga pukul 23:59. Data hari yang telah lewat akan otomatis dikunci oleh sistem.</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-save" id="btn-confirm-yes" style="margin-top: 0;">Ya, Simpan Sekarang</button>
+                <button class="btn-save btn-secondary" id="btn-confirm-no" style="margin-top: 0;">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sukses Presensi -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-content">
+            <div style="margin-bottom: 20px;">
+                <i class="fas fa-check-circle" style="font-size: 5.5rem; color: #10b981; filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.3));"></i>
+            </div>
+            <h3>Presensi Berhasil!</h3>
+            <p>Data kehadiran siswa telah berhasil disimpan secara aman ke dalam sistem pusat sekolah.</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-save" id="btn-done-next" style="margin-top: 0;">Presensi Kelas Lain</button>
+                <button class="btn-save btn-secondary" id="btn-done-report" style="margin-top: 0;">Lihat Laporan Rekap</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
     <script>
         // Setup Tanggal Hari Ini
         document.getElementById('tgl_absensi').valueAsDate = new Date();
 
-        // Konfigurasi Supabase (Menggunakan key dari data_guru.html)
-        const SB_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1/tb_guru"; // Mengambil daftar orang dari tb_guru
         const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptdm5xaXhqeGx5YWlnZWNncGdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyODA2MDIsImV4cCI6MjA5NDg1NjYwMn0.PW6qb8LXUDdu8E9P8WvGBPWZl4Z24jk-ue2XmZdorNo";
+        const BASE_URL = "https://zmvnqixjxlyaigecgpgi.supabase.co/rest/v1";
+        const headers = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
 
-        async function loadDaftarAbsensi() {
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        async function fetchData(endpoint) {
+            const res = await fetch(`${BASE_URL}/${endpoint}`, { headers });
+            return await res.json();
+        }
+
+        async function initPage() {
+            // Load Kelas
+            const kelas = await fetchData('tb_kelas?select=id_kelas,nama_kelas&order=nama_kelas');
+            const selectKelas = document.getElementById('select-kelas');
+            kelas.forEach(k => selectKelas.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`);
+
+            selectKelas.onchange = async (e) => {
+                const classId = e.target.value;
+                const selectJadwal = document.getElementById('select-jadwal');
+                selectJadwal.innerHTML = '<option value="">-- Pilih Jadwal --</option>';
+                selectJadwal.disabled = true;
+                document.getElementById('table-absensi').innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-filter"></i>Silakan pilih jadwal untuk memuat siswa.</td></tr>';
+
+                if (!classId) return;
+
+                // Cari jadwal untuk kelas ini
+                const jadwal = await fetchData(`tb_jadwal?id_kelas=eq.${classId}&select=*,tb_mapel(nama_mapel),tb_guru(nama_guru)&order=sesi_ke.asc`);
+                if (jadwal.length > 0) {
+                    jadwal.forEach(j => {
+                        selectJadwal.innerHTML += `<option value="${j.id_jadwal}">${j.tb_mapel.nama_mapel} (${j.sesi_ke}-${j.sesi_sampai}) - ${j.tb_guru.nama_guru}</option>`;
+                    });
+                    selectJadwal.disabled = false;
+                } else {
+                    showToast("Tidak ada jadwal ditemukan untuk kelas ini.", "error");
+                }
+            };
+
+            document.getElementById('select-jadwal').onchange = loadSiswa;
+            document.getElementById('tgl_absensi').onchange = loadSiswa;
+        }
+
+        async function loadSiswa() {
+            const classId = document.getElementById('select-kelas').value;
+            const jadwalId = document.getElementById('select-jadwal').value;
+            const tgl = document.getElementById('tgl_absensi').value;
             const tbody = document.getElementById('table-absensi');
+
+            if (!classId || !jadwalId || !tgl) return;
+
+            // Cek apakah tanggal yang dipilih adalah hari ini
+            const today = new Date().toISOString().split('T')[0];
+            const isToday = tgl === today;
+
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>';
             try {
-                const res = await fetch(`${SB_URL}?select=*`, {
-                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-                });
-                const data = await res.json();
+                // Ambil daftar siswa dan data absensi yang sudah ada secara paralel
+                const [siswa, existingAbsensi] = await Promise.all([
+                    fetchData(`tb_siswa?id_kelas=eq.${classId}&status_aktif=eq.true&order=nama_siswa`),
+                    fetchData(`tb_absensi?id_jadwal=eq.${jadwalId}&tgl_absensi=eq.${tgl}`)
+                ]);
+
                 tbody.innerHTML = '';
-                data.forEach((person, index) => {
+                
+                if (siswa.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Tidak ada siswa aktif di kelas ini.</td></tr>';
+                    return;
+                }
+
+                siswa.forEach((s, index) => {
+                    const record = existingAbsensi.find(a => a.id_siswa === s.id_siswa);
+                    const status = record ? record.status : 'H';
+                    const ket = record ? (record.keterangan || '') : '';
+                    
+                    // Kunci input jika bukan hari ini
+                    const disabledAttr = isToday ? '' : 'disabled';
+
                     tbody.innerHTML += `
                         <tr>
                             <td>${index + 1}</td>
-                            <td><strong>${person.nama_guru}</strong></td>
+                            <td>
+                                <strong>${s.nama_siswa}</strong><br>
+                                <small style="color:var(--text-muted)">NIS: ${s.nis}</small>
+                            </td>
                             <td>
                                 <div class="status-group">
-                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="H" checked> H</label>
-                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="S"> S</label>
-                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="I"> I</label>
-                                    <label class="status-item"><input type="radio" name="status_${person.id_guru}" value="A"> A</label>
+                                    <label>
+                                        <input type="radio" name="status_${s.id_siswa}" value="H" ${status === 'H' ? 'checked' : ''} ${disabledAttr}>
+                                        <div class="status-btn"><i class="fas fa-check"></i> Hadir</div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="status_${s.id_siswa}" value="S" ${status === 'S' ? 'checked' : ''} ${disabledAttr}>
+                                        <div class="status-btn"><i class="fas fa-medkit"></i> Sakit</div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="status_${s.id_siswa}" value="I" ${status === 'I' ? 'checked' : ''} ${disabledAttr}>
+                                        <div class="status-btn"><i class="fas fa-envelope"></i> Izin</div>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="status_${s.id_siswa}" value="A" ${status === 'A' ? 'checked' : ''} ${disabledAttr}>
+                                        <div class="status-btn"><i class="fas fa-times"></i> Alpa</div>
+                                    </label>
                                 </div>
                             </td>
-                            <td><input type="text" placeholder="Catatan..." style="width:100%; padding:5px; border-radius:4px; border:1px solid var(--nav-border); background:transparent; color:var(--text-color);"></td>
+                            <td><input type="text" name="ket_${s.id_siswa}" class="input-ket" value="${ket}" ${disabledAttr} placeholder="Keterangan (Opsional)..."></td>
                         </tr>`;
                 });
-            } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Gagal memuat data.</td></tr>'; }
+
+                // Update tombol: Sembunyikan jika hari sudah lewat (Lock)
+                const btnSimpan = document.getElementById('btn-simpan-absensi');
+                if (isToday) {
+                    btnSimpan.style.display = 'block';
+                    btnSimpan.innerText = existingAbsensi.length > 0 ? "Perbarui Presensi Hari Ini" : "Simpan Presensi Hari Ini";
+                } else {
+                    btnSimpan.style.display = 'none';
+                }
+            } catch (err) { tbody.innerHTML = '<tr><td colspan="4">Gagal memuat data siswa.</td></tr>'; }
         }
 
-        document.getElementById('btn-simpan-absensi').onclick = async () => {
-            const btn = document.getElementById('btn-simpan-absensi');
-            btn.disabled = true;
-            btn.innerText = "Menyimpan...";
+        const confirmSaveModal = document.getElementById('confirm-save-modal');
+
+        document.getElementById('btn-simpan-absensi').onclick = () => {
+            const jadwalId = document.getElementById('select-jadwal').value;
+            if (!jadwalId) { showToast("Silakan pilih jadwal terlebih dahulu.", "error"); return; }
+            confirmSaveModal.style.display = 'flex';
+        };
+
+        document.getElementById('btn-confirm-no').onclick = () => confirmSaveModal.style.display = 'none';
+
+        document.getElementById('btn-confirm-yes').onclick = async () => {
+            confirmSaveModal.style.display = 'none';
+            const jadwalId = document.getElementById('select-jadwal').value;
+            const tgl = document.getElementById('tgl_absensi').value;
             
-            // Simulasi penyimpanan (karena tabel tb_absensi mungkin belum dibuat di Supabase Anda)
-            setTimeout(() => {
-                alert("Absensi berhasil disimpan secara lokal!");
-                btn.disabled = false;
-                btn.innerText = "Simpan Absensi";
-            }, 1000);
+            const btn = document.getElementById('btn-simpan-absensi');
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            
+            const payloads = [];
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            
+            radios.forEach(radio => {
+                const idSiswa = radio.name.split('_')[1];
+                const keterangan = document.querySelector(`input[name="ket_${idSiswa}"]`).value;
+                payloads.push({
+                    id_absensi: `ABS-${jadwalId}-${idSiswa}-${tgl}`.substring(0, 50),
+                    id_jadwal: jadwalId,
+                    id_siswa: idSiswa,
+                    tgl_absensi: tgl,
+                    status: radio.value,
+                    keterangan: keterangan
+                });
+            });
+
+            try {
+                // Simpan ke Supabase (Upsert menggunakan resolution=merge-duplicates)
+                const res = await fetch(`${BASE_URL}/tb_absensi`, {
+                    method: 'POST',
+                    headers: { 
+                        ...headers, 
+                        'Prefer': 'return=minimal,resolution=merge-duplicates' 
+                    },
+                    body: JSON.stringify(payloads)
+                });
+
+                if (res.ok) {
+                    // Tampilkan Modal Sukses daripada Toast
+                    document.getElementById('success-modal').style.display = 'flex';
+                } else {
+                    throw new Error("Gagal menyimpan ke database.");
+                }
+            } catch (err) {
+                showToast(err.message, "error");
+            } finally {
+                btn.disabled = false; btn.innerText = "Simpan Absensi";
+            }
+        };
+
+        // Logika Tombol pada Modal Sukses
+        document.getElementById('btn-done-next').onclick = () => {
+            // Refresh halaman atau reset pilihan untuk kelas lain
+            location.reload();
+        };
+
+        document.getElementById('btn-done-report').onclick = () => {
+            const role = new URLSearchParams(window.location.search).get('role') || 'User';
+            window.location.href = `laporan.html?role=${role}`;
         };
 
         // Animasi Background (Sama dengan halaman lain)
@@ -415,14 +673,15 @@
         document.getElementById('link-dashboard').href = `dashboard.html?role=${role}`;
         document.getElementById('link-siswa').href = `data_siswa.html?role=${role}`;
         document.getElementById('link-guru').href = `data_guru.html?role=${role}`;
+        document.getElementById('link-jadwal').href = `data_jadwal.html?role=${role}`;
         document.getElementById('link-absensi').href = `absensi.html?role=${role}`;
         document.getElementById('link-mapel').href = `data_mapel.html?role=${role}`;
         document.getElementById('link-kelas').href = `data_kelas.html?role=${role}`;
         document.getElementById('link-jurusan').href = `data_jurusan.html?role=${role}`;
-        document.getElementById('link-laporan').href = `#?role=${role}`; // Placeholder
+        document.getElementById('link-laporan').href = `laporan.html?role=${role}`;
         document.getElementById('link-pengaturan').href = `pengaturan.html?role=${role}`;
 
-        loadDaftarAbsensi();
+        initPage();
     </script>
 </body>
 </html>
